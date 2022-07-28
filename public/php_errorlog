@@ -1,0 +1,16 @@
+[13-Jul-2022 18:31:18 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/customer/www/dispensaries.420finder.net/public_html/public/../vendor/autoload.php' (include_path='.:/usr/local/php80/pear') in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php on line 34
+[13-Jul-2022 18:31:29 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/customer/www/dispensaries.420finder.net/public_html/public/../vendor/autoload.php' (include_path='.:/usr/local/php80/pear') in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php on line 34
+[13-Jul-2022 18:33:10 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/customer/www/dispensaries.420finder.net/public_html/public/../vendor/autoload.php' (include_path='.:/usr/local/php80/pear') in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php:34
+Stack trace:
+#0 {main}
+  thrown in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php on line 34
+[18-Jul-2022 14:47:36 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/home/customer/www/dispensaries.420finder.net/public_html/public/../bootstrap/app.php' (include_path='.:/usr/local/php80/pear') in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php:47
+Stack trace:
+#0 {main}
+  thrown in /home/customer/www/dispensaries.420finder.net/public_html/public/index.php on line 47
