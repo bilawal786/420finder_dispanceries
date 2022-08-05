@@ -40,7 +40,14 @@ Route::group(['namespace' =>'App\Http\Controllers', 'middleware' => ['checkIfAut
 
     ]);
 });
-
+Route::get('/redirect-to-dispansary/{id}', function ($id){
+    $business = \App\Models\Business::find($id);
+    \Illuminate\Support\Facades\Session::put('business_id', $id);
+    \Illuminate\Support\Facades\Session::put('business_name', $business->name);
+    \Illuminate\Support\Facades\Session::put('business_type', $business->type);
+    \Illuminate\Support\Facades\Session::put('business_email', $business->email);
+    return redirect()->route('index');
+});
 Route::group(['namespace' =>'App\Http\Controllers', 'middleware' => ['checkIfAuthenticated', 'checkIfApproved']], function() {
 
     Route::get('/index', [
@@ -110,7 +117,7 @@ Route::group(['namespace' =>'App\Http\Controllers', 'middleware' => ['checkIfAut
         'as' => 'update-business-phone'
 
     ]);
-    
+
     Route::post('/savephonenumber', [
 
         'uses' => 'AccountController@savephonenumber',

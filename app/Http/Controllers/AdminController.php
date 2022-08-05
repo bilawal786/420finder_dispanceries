@@ -80,7 +80,7 @@ class AdminController extends Controller {
 
     public function checkLogin(Request $request) {
 
-        $business = Business::where('email', $request->email)->where('business_type', 'dispensary')->get();
+        $business = Business::where('email', $request->email)->get();
 
         if (count($business) > 0) {
 

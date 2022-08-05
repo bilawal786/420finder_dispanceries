@@ -27,7 +27,7 @@
                         <div class="col-md-12">
 
                             @include('partials.success-error')
-                            
+
                             <form action="{{ route('submitproductrequest') }}" method="POST">
                                 @csrf
                                 <div class="form-group">
@@ -36,7 +36,7 @@
                                         <option value="">Select</option>
                                         @if($brands->count() > 0)
                                             @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                            <option value="{{ $brand->id }}">{{ $brand->business_name }}</option>
                                             @endforeach
                                         @endif
                                     </select>
@@ -88,22 +88,20 @@
                                                     <td>{{ $index + 1 }}</td>
                                                     <td>
                                                         <?php
-                                                        $brand = App\Models\Brand::where('id', $request->brand_id)
-                                                        ->select('name')
+                                                        $brand = App\Models\Business::where('id', $request->brand_id)
+                                                        ->select('business_name')
                                                             ->first();
-                                                            echo "<strong>" . $brand->name . "</strong>";
+                                                            echo "<strong>" . $brand->business_name . "</strong>";
                                                         ?>
                                                     </td>
                                                     <td>
                                                         <?php
 
                                                             $products = explode(", ", $request->products);
-
                                                             foreach($products as $init => $id) {
-                                                                $product = App\Models\BrandProduct::where('id', $id)
-                                                                    ->select('name')
+                                                                $product = App\Models\BrandProduct::where('id', (int)$id)
                                                                     ->first();
-                                                                echo "<strong>" . $init + 1 . "</strong>. " . $product->name . ".<br>";
+                                                                echo  $product->name . "<br>";
                                                             }
 
                                                         ?>

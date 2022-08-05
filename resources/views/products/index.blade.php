@@ -7,7 +7,7 @@ $months = array(1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 =>
 
     @section('content')
 
-        @if(!is_null($paid))
+        @if(is_null($paid))
         <div class="panel panel-headline">
             <div class="panel-heading">
                 <div class="row">

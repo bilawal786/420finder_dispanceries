@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use Exception;
 use App\Models\Deal;
 use App\Models\Brand;
@@ -33,9 +34,11 @@ use Intervention\Image\Facades\Image;
 use App\Models\DispenseryProductGallery;
 
 
-class ProductController extends Controller {
+class ProductController extends Controller
+{
 
-    public function index() {
+    public function index()
+    {
 
         $products = DispenseryProduct::where('dispensery_id', session('business_id'))->latest()->get();
 
@@ -46,13 +49,14 @@ class ProductController extends Controller {
 
     }
 
-    public function productrequests() {
+    public function productrequests()
+    {
 
-        if(is_null($this->checkIfPaid())) {
-            return $this->redirectToPayment();
-        }
+//        if (is_null($this->checkIfPaid())) {
+//            return $this->redirectToPayment();
+//        }
 
-        $brands = Brand::where('status', 1)->select('id', 'name')->get();
+        $brands = Business::where('business_type', 'Brand')->where('approve', 1)->select('id', 'business_name')->get();
 
         $requests = ProductRequest::where('retailer_id', session('business_id'))->get();
 
@@ -62,7 +66,8 @@ class ProductController extends Controller {
 
     }
 
-    public function getrproducts(Request $request) {
+    public function getrproducts(Request $request)
+    {
 
         $brand_id = $request->brand_id;
 
@@ -74,7 +79,7 @@ class ProductController extends Controller {
                     <option value="">Select</option>
                 ';
 
-        foreach($products as $product) {
+        foreach ($products as $product) {
 
             $data .= '
                 <option value="' . $product["id"] . '">' . $product["name"] . '</option>
@@ -86,7 +91,8 @@ class ProductController extends Controller {
 
     }
 
-    public function submitproductrequest(Request $request) {
+    public function submitproductrequest(Request $request)
+    {
 
         $validated = $request->validate([
             'product_id' => 'required',
@@ -109,20 +115,21 @@ class ProductController extends Controller {
 
     }
 
-    public function editproduct($id) {
+    public function editproduct($id)
+    {
 
 
-        if(is_null($this->checkIfPaid())) {
+        if (is_null($this->checkIfPaid())) {
             return $this->redirectToPayment();
         }
 
-        if(is_null($this->checkIfRetailerProduct($id))) {
+        if (is_null($this->checkIfRetailerProduct($id))) {
             return redirect()->route('products');
         }
 
         $product = DispenseryProduct::where('id', $id)->first();
 
-        if($product->brand_product) {
+        if ($product->brand_product) {
             return back();
         }
 
@@ -144,7 +151,8 @@ class ProductController extends Controller {
     *
     */
 
-    public function gettypesubcat(Request $request) {
+    public function gettypesubcat(Request $request)
+    {
 
         $category_id = $request->category_id;
 
@@ -154,26 +162,26 @@ class ProductController extends Controller {
 
             <div class="row categoriesCols">
                 ';
-                foreach($types as $type) {
-                    $data .='
+        foreach ($types as $type) {
+            $data .= '
                     <div class="col-md-3">
                         <h6 class="pb-2"><strong>' . $type->name . '</strong></h6>
                         <ul class="list-unstyled">';
 
-                        $subcategories = SubCategory::where('type_id', $type->id)->where('parent_id', 0)->get();
+            $subcategories = SubCategory::where('type_id', $type->id)->where('parent_id', 0)->get();
 
-                        foreach($subcategories as $subcat) {
-                            $data .= '
+            foreach ($subcategories as $subcat) {
+                $data .= '
 
                                 <li class="mb-2"><label><input rel="' . $subcat->name . '" type="radio" class="childOfParentSC" name="type_' . $type->name . '" value="' . $subcat->id . '" required=""> ' . $subcat->name . '</label></li>
 
                             ';
-                        }
+            }
 
-                        $data .='</ul>
+            $data .= '</ul>
                     </div>';
-                }
-            $data .= "
+        }
+        $data .= "
                 <script>
 
                     $('.childOfParentSC').on('click', function() {
@@ -210,9 +218,9 @@ class ProductController extends Controller {
             ";
 
         $response = [
-                        'statuscode'=> 200,
-                        'data' => $data
-                    ];
+            'statuscode' => 200,
+            'data' => $data
+        ];
 
         echo json_encode($response);
 
@@ -222,27 +230,28 @@ class ProductController extends Controller {
     *   GET PARENT CHILD
     *
     */
-    public function getparentchildsc(Request $request) {
+    public function getparentchildsc(Request $request)
+    {
 
         $subcategories = SubCategory::where('parent_id', $request->subcat_id)->get();
         $data = '';
 
         if ($subcategories->count() > 0) {
 
-            $data .='
+            $data .= '
                 <div class="col-md-3 subchild">
                     <h6 class="pb-2"><strong>' . $request->type_name . ' Type</strong></h6>
                     <ul class="list-unstyled">';
 
-                    foreach($subcategories as $subcat) {
-                        $data .= '
+            foreach ($subcategories as $subcat) {
+                $data .= '
 
                             <li class="mb-2"><label><input rel="' . $subcat->name . '" type="radio" class="childOfParentSC" name="type_' . $request->type_name . '" value="' . $subcat->id . '" required=""> ' . $subcat->name . '</label></li>
 
                         ';
-                    }
+            }
 
-                    $data .='</ul>
+            $data .= '</ul>
                 </div>
                 <script>
                     $(".childOfParentSC").on("click", function(){
@@ -265,16 +274,17 @@ class ProductController extends Controller {
 
     }
 
-      /*
-    *  CREATE PRODUCT
-    *
-    */
+    /*
+  *  CREATE PRODUCT
+  *
+  */
 
-    public function create() {
-
-        if(is_null($this->checkIfPaid())) {
-            return $this->redirectToPayment();
-        }
+    public function create()
+    {
+//
+//        if (is_null($this->checkIfPaid())) {
+//            return $this->redirectToPayment();
+//        }
 
         $categories = Category::all();
 
@@ -293,13 +303,14 @@ class ProductController extends Controller {
     *
     */
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
-        if(is_null($this->checkIfPaid())) {
-            return $this->redirectToPayment();
-        }
+//        if (is_null($this->checkIfPaid())) {
+//            return $this->redirectToPayment();
+//        }
 
-        $UUID = (string) Str::uuid();
+        $UUID = (string)Str::uuid();
 
         $validated = $request->validate([
             'name' => 'required',
@@ -321,13 +332,13 @@ class ProductController extends Controller {
 
         $product->description = $request->description;
 
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
 
             $avatar = $request->file('image');
             $filename = time() . '.' . $avatar->GetClientOriginalExtension();
 
             $avatar_img = Image::make($avatar);
-            $avatar_img->resize(274,274)->save(public_path('images/brands/products/' . $filename));
+            $avatar_img->resize(274, 274)->save(public_path('images/brands/products/' . $filename));
 
             $product->image = asset("images/brands/products/" . $filename);
 
@@ -381,9 +392,9 @@ class ProductController extends Controller {
 
             if ($request->hasFile('galleryimages')) {
 
-                foreach($request->file('galleryimages') as $image) {
+                foreach ($request->file('galleryimages') as $image) {
 
-                    $name=$image->getClientOriginalName();
+                    $name = $image->getClientOriginalName();
                     $name = $UUID . '-' . $name;
                     $image->move(public_path('images/dispensery/products/gallery'), $name);
 
@@ -415,13 +426,13 @@ class ProductController extends Controller {
     public function destroy($dispensaryProduct)
     {
 
-        if(is_null($this->checkIfPaid())) {
+        if (is_null($this->checkIfPaid())) {
             return $this->redirectToPayment();
         }
 
         // $dispensaryProduct = DispenseryProduct::find($dispensaryProduct)->delete();
 
-        if(is_null($this->checkIfRetailerProduct($dispensaryProduct))) {
+        if (is_null($this->checkIfRetailerProduct($dispensaryProduct))) {
             return redirect()->back();
         }
 
@@ -436,7 +447,7 @@ class ProductController extends Controller {
 
         $dispensaryProduct = $dispensaryProductDB->delete();
 
-        if($dispensaryProduct) {
+        if ($dispensaryProduct) {
 
             // Orders
             Order::where('retailer_id', session('business_id'))->where('product_id', $dispensaryProductId)->delete();
@@ -454,14 +465,13 @@ class ProductController extends Controller {
             DeliveryCart::where('business_id', session('business_id'))->where('product_id', $dispensaryProductId)->delete();
 
             // Dispensary Product Gallery
-            if(!is_null($dispensaryProductGallery)) {
-                foreach($dispensaryProductGallery as $image) {
+            if (!is_null($dispensaryProductGallery)) {
+                foreach ($dispensaryProductGallery as $image) {
                     $exp = explode('/', $image->image);
                     $expImage = $exp[count($exp) - 1];
 
-                    if(File::exists(public_path('images/dispensery/products/gallery/'.$expImage)))
-                    {
-                        File::delete(public_path('images/dispensery/products/gallery/'.$expImage));
+                    if (File::exists(public_path('images/dispensery/products/gallery/' . $expImage))) {
+                        File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
                     }
                 }
             }
@@ -475,12 +485,11 @@ class ProductController extends Controller {
             // Retailer Reviews
             RetailerReview::where('dispensary_product_id', $dispensaryProductId)->delete();
 
-            if($oldImage) {
+            if ($oldImage) {
                 $exp = explode('/', $oldImage);
                 $expImage = $exp[count($exp) - 1];
-                if(File::exists(public_path('images/brands/products/'.$expImage)))
-                {
-                    File::delete(public_path('images/brands/products/'.$expImage));
+                if (File::exists(public_path('images/brands/products/' . $expImage))) {
+                    File::delete(public_path('images/brands/products/' . $expImage));
                 }
             }
 
@@ -492,11 +501,12 @@ class ProductController extends Controller {
 
     }
 
-    public function removegalleryimage($id) {
+    public function removegalleryimage($id)
+    {
 
         $gimage = DispenseryProductGallery::find($id);
 
-        if(is_null($this->checkIfRetailerProduct($gimage->dispensery_product_id))) {
+        if (is_null($this->checkIfRetailerProduct($gimage->dispensery_product_id))) {
             return redirect()->back();
         }
 
@@ -504,15 +514,14 @@ class ProductController extends Controller {
 
         $deleted = $gimage->delete();
 
-        if($deleted) {
+        if ($deleted) {
 
-            if($oldImage) {
+            if ($oldImage) {
                 $exp = explode('/', $oldImage);
                 $expImage = $exp[count($exp) - 1];
 
-                if(File::exists(public_path('images/dispensery/products/gallery/'.$expImage)))
-                {
-                    File::delete(public_path('images/dispensery/products/gallery/'.$expImage));
+                if (File::exists(public_path('images/dispensery/products/gallery/' . $expImage))) {
+                    File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
                 }
             }
 
@@ -525,13 +534,14 @@ class ProductController extends Controller {
 
     }
 
-    public function updateproduct(Request $request) {
+    public function updateproduct(Request $request)
+    {
 
-        if(is_null($this->checkIfPaid())) {
-            return $this->redirectToPayment();
-        }
+//        if (is_null($this->checkIfPaid())) {
+//            return $this->redirectToPayment();
+//        }
 
-        $UUID = (string) Str::uuid();
+        $UUID = (string)Str::uuid();
 
         $validated = $request->validate([
             'product_id' => 'required',
@@ -541,7 +551,7 @@ class ProductController extends Controller {
             'status' => 'required'
         ]);
 
-        if(is_null($this->checkIfRetailerProduct($request->product_id))) {
+        if (is_null($this->checkIfRetailerProduct($request->product_id))) {
             return redirect()->back();
         }
 
@@ -555,13 +565,13 @@ class ProductController extends Controller {
 
         $oldImage = NULL;
 
-        if($request->hasFile('image')) {
+        if ($request->hasFile('image')) {
 
             $avatar = $request->file('image');
             $filename = time() . '.' . $avatar->GetClientOriginalExtension();
 
             $avatar_img = Image::make($avatar);
-            $avatar_img->resize(274,274)->save(public_path('images/brands/products/' . $filename));
+            $avatar_img->resize(274, 274)->save(public_path('images/brands/products/' . $filename));
 
             $oldImage = $product->image;
             $product->image = asset("images/brands/products/" . $filename);
@@ -592,13 +602,12 @@ class ProductController extends Controller {
 
         if ($product->save()) {
 
-            if(!is_null($oldImage)) {
+            if (!is_null($oldImage)) {
                 $exp = explode('/', $oldImage);
                 $expImage = $exp[count($exp) - 1];
 
-                if(File::exists(public_path('images/brands/products/'.$expImage)))
-                {
-                    File::delete(public_path('images/brands/products/'.$expImage));
+                if (File::exists(public_path('images/brands/products/' . $expImage))) {
+                    File::delete(public_path('images/brands/products/' . $expImage));
                 }
             }
 
@@ -606,9 +615,9 @@ class ProductController extends Controller {
                 $dispensaryGalleryImgs = DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->get();
                 DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->delete();
 
-                foreach($request->file('galleryimages') as $image) {
+                foreach ($request->file('galleryimages') as $image) {
 
-                    $name=$image->getClientOriginalName();
+                    $name = $image->getClientOriginalName();
                     $name = $UUID . '-' . $name;
                     $image->move(public_path('images/dispensery/products/gallery'), $name);
 
@@ -621,14 +630,13 @@ class ProductController extends Controller {
                 }
 
                 // DELETE PREVIOUS GALLERY IMAGES
-                if(!is_null($dispensaryGalleryImgs)) {
-                    foreach($dispensaryGalleryImgs as $image) {
+                if (!is_null($dispensaryGalleryImgs)) {
+                    foreach ($dispensaryGalleryImgs as $image) {
                         $exp = explode('/', $image->image);
                         $expImage = $exp[count($exp) - 1];
 
-                        if(File::exists(public_path('images/dispensery/products/gallery/'.$expImage)))
-                        {
-                            File::delete(public_path('images/dispensery/products/gallery/'.$expImage));
+                        if (File::exists(public_path('images/dispensery/products/gallery/' . $expImage))) {
+                            File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
                         }
                     }
                 }
@@ -650,7 +658,8 @@ class ProductController extends Controller {
     *   STORE RETAILER PAYMENT
     *
     */
-    public function storeRetailerPayment(Request $request) {
+    public function storeRetailerPayment(Request $request)
+    {
 
         $validated = request()->validate([
             'name_on_card' => 'required|min:2',
@@ -663,58 +672,58 @@ class ProductController extends Controller {
         $createdId = NULL;
         try {
             $authorizePayment = resolve(AuthorizeService::class);
-        $response = $authorizePayment->chargeCreditCard($validated);
-        $tresponse = $response->getTransactionResponse();
+            $response = $authorizePayment->chargeCreditCard($validated);
+            $tresponse = $response->getTransactionResponse();
 
-        if ($tresponse != null && $tresponse->getMessages() != null) {
+            if ($tresponse != null && $tresponse->getMessages() != null) {
 
-            $created = RetailerMenuOrder::create([
-                'retailer_id' => session('business_id'),
-                'amount' => '5.00',
-                'name_on_card' => $validated['name_on_card'],
-                'response_code' => $tresponse->getResponseCode(),
-                'transaction_id' => $tresponse->getTransId(),
-                'auth_id' => $tresponse->getAuthCode(),
-                'message_code' => $tresponse->getMessages()[0]->getCode(),
-                'quantity' => 1,
-            ]);
+                $created = RetailerMenuOrder::create([
+                    'retailer_id' => session('business_id'),
+                    'amount' => '5.00',
+                    'name_on_card' => $validated['name_on_card'],
+                    'response_code' => $tresponse->getResponseCode(),
+                    'transaction_id' => $tresponse->getTransId(),
+                    'auth_id' => $tresponse->getAuthCode(),
+                    'message_code' => $tresponse->getMessages()[0]->getCode(),
+                    'quantity' => 1,
+                ]);
 
-            $createdId = $created->id;
+                $createdId = $created->id;
 
-            if($created) {
+                if ($created) {
 
-                session()->flash('success', 'Your payment has been successful');
+                    session()->flash('success', 'Your payment has been successful');
+
+                    $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+
+                    return view('products.index')
+                        ->with('products', $products)
+                        ->with('paid', $created);
+
+                } else {
+
+                    session()->flash('error', 'Sorry something went wrong');
+
+                    $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+
+                    return view('products.index')
+                        ->with('products', $products)
+                        ->with('paid', NULL);
+
+                }
+
+            } else {
+
+                session()->flash('error', 'Sorry we couldn\'t process the payment');
 
                 $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
 
                 return view('products.index')
                     ->with('products', $products)
-                    ->with('paid', $created);
-
-            } else {
-
-                session()->flash('error', 'Sorry something went wrong');
-
-                $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
-
-                return view('products.index')
-                ->with('products', $products)
-                ->with('paid', NULL);
-
+                    ->with('paid', NULL);
             }
-
-        } else {
-
-            session()->flash('error', 'Sorry we couldn\'t process the payment');
-
-            $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
-
-            return view('products.index')
-                ->with('products', $products)
-                ->with('paid', NULL);
-        }
-        } catch(Exception $e) {
-            if(!is_null($createdId)) {
+        } catch (Exception $e) {
+            if (!is_null($createdId)) {
                 RetailerMenuOrder::where('id', $createdId)->delete();
             }
 
@@ -735,7 +744,8 @@ class ProductController extends Controller {
     *
     */
 
-    private function checkIfPaid(){
+    private function checkIfPaid()
+    {
 
         $retailerMenuOrder = RetailerMenuOrder::where('retailer_id', session('business_id'))->first();
 
@@ -746,7 +756,8 @@ class ProductController extends Controller {
     *   REDIRECT TO PAYMENT
     *
     */
-    private function redirectToPayment() {
+    private function redirectToPayment()
+    {
         $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
         $paid = RetailerMenuOrder::where('retailer_id', session('business_id'))->first();
         return redirect()->route('products')
@@ -758,7 +769,8 @@ class ProductController extends Controller {
     *   CHECK IF RETAILER PRODUCT
     *
     */
-    private function checkIfRetailerProduct($productId) {
+    private function checkIfRetailerProduct($productId)
+    {
         $businessId = session('business_id');
 
         $product = DispenseryProduct::where([
