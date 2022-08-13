@@ -24,7 +24,6 @@ class AdminController extends Controller {
     }
 
     public function index() {
-
         $deals = Deal::whereBetween('created_at', [
             Carbon::now()->startOfYear(),
             Carbon::now()->endOfYear(),

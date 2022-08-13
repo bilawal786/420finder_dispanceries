@@ -1,7 +1,21 @@
 @extends('layouts.admin')
 
-    @section('content')
+@section('content')
 
+    <div class="panel panel-headline">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    @php
+                        $text = DB::table('tests')->first();
+                    @endphp
+                    <h4>
+                        {{$text->dis_request_product}}
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
 
@@ -36,14 +50,15 @@
                                         <option value="">Select</option>
                                         @if($brands->count() > 0)
                                             @foreach($brands as $brand)
-                                            <option value="{{ $brand->id }}">{{ $brand->business_name }}</option>
+                                                <option value="{{ $brand->id }}">{{ $brand->business_name }}</option>
                                             @endforeach
                                         @endif
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label>Product</label>
-                                    <select id="rp_products" name="product_id[]" class="selectPlugin form-control" multiple="multiple" required="">
+                                    <select id="rp_products" name="product_id[]" class="selectPlugin form-control"
+                                            multiple="multiple" required="">
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -75,58 +90,59 @@
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
-                                        <th>#</th>
-                                        <th>Brand Name</th>
-                                        <th>Product Name</th>
-                                        <th>Status</th>
-                                        <th>Request Submitted At</th>
+                                    <th>#</th>
+                                    <th>Brand Name</th>
+                                    <th>Product Name</th>
+                                    <th>Status</th>
+                                    <th>Request Submitted At</th>
                                     </thead>
                                     <tbody>
-                                        @if($requests->count() >0)
-                                            @foreach($requests as $index => $request)
-                                                <tr>
-                                                    <td>{{ $index + 1 }}</td>
-                                                    <td>
-                                                        <?php
-                                                        $brand = App\Models\Business::where('id', $request->brand_id)
+                                    @if($requests->count() >0)
+                                        @foreach($requests as $index => $request)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>
+                                                    <?php
+                                                    $brand = App\Models\Business::where('id', $request->brand_id)
                                                         ->select('business_name')
+                                                        ->first();
+                                                    echo "<strong>" . $brand->business_name . "</strong>";
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php
+
+                                                    $products = explode(", ", $request->products);
+                                                    foreach ($products as $init => $id) {
+                                                        $product = App\Models\BrandProduct::where('id', (int)$id)
                                                             ->first();
-                                                            echo "<strong>" . $brand->business_name . "</strong>";
-                                                        ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php
+                                                        echo $product->name . "<br>";
+                                                    }
 
-                                                            $products = explode(", ", $request->products);
-                                                            foreach($products as $init => $id) {
-                                                                $product = App\Models\BrandProduct::where('id', (int)$id)
-                                                                    ->first();
-                                                                echo  $product->name . "<br>";
-                                                            }
-
-                                                        ?>
-                                                    </td>
-                                                    <td>
-                                                        <?php
-                                                        if ($request->status == '') {
-                                                            ?>
-                                                            <span class="label label-warning">Pending</span>
-                                                            <?php
-                                                        } elseif ($request->status == 0) {
-                                                            ?>
-                                                            <span class="label label-danger">Rejected</span>
-                                                            <?php
-                                                        } elseif ($request->status == 1) {
-                                                            ?>
-                                                            <span class="label label-info">Approved</span>
-                                                            <?php
-                                                        }
-                                                        ?>
-                                                    </td>
-                                                    <td>{{ $request->created_at->diffForHumans() }} At <br> {{ $request->created_at }}</td>
-                                                </tr>
-                                            @endforeach
-                                        @endif
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <?php
+                                                    if ($request->status == '') {
+                                                    ?>
+                                                    <span class="label label-warning">Pending</span>
+                                                    <?php
+                                                    } elseif ($request->status == 0) {
+                                                    ?>
+                                                    <span class="label label-danger">Rejected</span>
+                                                    <?php
+                                                    } elseif ($request->status == 1) {
+                                                    ?>
+                                                    <span class="label label-info">Approved</span>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                </td>
+                                                <td>{{ $request->created_at->diffForHumans() }} At
+                                                    <br> {{ $request->created_at }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @endif
                                     </tbody>
                                 </table>
                             </div>
@@ -138,4 +154,4 @@
         </div>
     </div>
 
-    @endsection
+@endsection
