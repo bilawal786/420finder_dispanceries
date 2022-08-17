@@ -2,20 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Models\Deal;
 use App\Models\DealOrder;
 use App\Models\DealProduct;
+use App\Models\DispenseryProduct;
+use App\Models\States;
+use App\Models\SubscriptionDetail;
+use App\Models\SubscriptionDetails;
+use App\Services\AuthorizeService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use App\Models\DispenseryProduct;
-use App\Services\AuthorizeService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Facades\Image;
 
-class DealsController extends Controller {
+class DealsController extends Controller
+{
 
-    public function index() {
+    public function index()
+    {
 
         $deals = Deal::where('retailer_id', session('business_id'))->latest()->get();
 
@@ -24,186 +30,10 @@ class DealsController extends Controller {
 
     }
 
-    public function create() {
+    public function edit($id)
+    {
 
-        $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
-        return view('deals.create', [
-            'products' => $products
-        ]);
-
-    }
-
-    public function save(Request $request) {
-
-        $validated = request()->validate([
-            'title' => 'required',
-            'tier_id' => 'required',
-            'description' => 'required',
-            'deal_price' => 'required',
-            'name_on_card' => 'required|min:2',
-            'cvv' => 'required|numeric|digits:3',
-            'card_number' => 'required|numeric|digits:16',
-            'expiration_month' => 'required',
-            'expiration_year' => 'required'
-        ]);
-
-        if(!is_null($request->product_id) && !is_null($request->product_id_2)) {
-            if($request->product_id == $request->product_id_2) {
-                return redirect()->back()->with('error', 'Deal products must be different');
-            }
-        }
-
-        $tiers = [1, 2, 3];
-            $price = 0;
-            $ending_date = "";
-
-            if(!in_array($validated['tier_id'], $tiers)) {
-                return back();
-            }
-
-            if($validated['tier_id'] == 1) {
-
-                $ending_date = Carbon::now()->addDays(7)->format('Y-m-d');
-                $price = 50.00;
-
-            } elseif($validated['tier_id'] == 2) {
-
-                $ending_date = Carbon::now()->addDays(14)->format('Y-m-d');
-                $price = 80.00;
-
-            } elseif($validated['tier_id'] == 3) {
-
-                $ending_date = Carbon::now()->addDays(30)->format('Y-m-d');
-                $price = 140.00;
-
-            }
-
-            $starting_date = Carbon::now()->format('Y-m-d');
-
-            $dealId = NULL;
-            $dealOrderId = NULL;
-
-            try {
-
-                $authorizePayment = resolve(AuthorizeService::class);
-                $response = $authorizePayment->chargeCreditCard($validated, $price);
-                $tresponse = $response->getTransactionResponse();
-
-                if ($tresponse != null && $tresponse->getMessages() != null) {
-
-                    $deal = new Deal;
-
-                    $deal->retailer_id = session('business_id');
-                    $deal->title = $request->title;
-
-                    $picturePaths = [];
-
-                    if($request->hasFile('picture')) {
-
-                        $avatars = $request->file('picture');
-
-                        foreach($avatars as $avatar) {
-                            $filename = time() . '.' . $avatar->GetClientOriginalExtension();
-
-                            $avatar_img = Image::make($avatar);
-                            $avatar_img->resize(373,373)->save(public_path('images/deals/' . $filename));
-
-                            $dealPicture = asset("images/deals/" . $filename);
-                            array_push($picturePaths, $dealPicture);
-                        }
-
-                    }
-
-                    $deal->picture = json_encode($picturePaths);
-                    $deal->coupon_code = $request->coupon_code;
-                    $deal->percentage = $request->percentage;
-                    $deal->tier_id = $validated['tier_id'];
-                    $deal->deal_price = $validated['deal_price'];
-                    $deal->starting_date = $starting_date;
-                    $deal->ending_date = $ending_date;
-                    $deal->description = $request->description;
-                    $deal->is_paid = 1;
-                    $deal->save();
-
-                    $created = DealOrder::create([
-                        'retailer_id' => session('business_id'),
-                        'deal_id' => $deal->id,
-                        'amount' => $price,
-                        'name_on_card' => $validated['name_on_card'],
-                        'response_code' => $tresponse->getResponseCode(),
-                        'transaction_id' => $tresponse->getTransId(),
-                        'auth_id' => $tresponse->getAuthCode(),
-                        'message_code' => $tresponse->getMessages()[0]->getCode(),
-                        'quantity' => 1,
-                    ]);
-
-                    $dealOrderId = $created->id;
-
-                    if($request->product_id) {
-                        DealProduct::create([
-                            'deal_id' => $deal->id,
-                            'product_id' => $request->product_id
-                        ]);
-                    }
-
-                    if($request->product_id_2) {
-                        DealProduct::create([
-                            'deal_id' => $deal->id,
-                            'product_id' => $request->product_id_2
-                        ]);
-                    }
-
-                    return redirect()->back()->with('info', 'Deal created.');
-
-                } else {
-
-                    return redirect()->back()->with('error', 'Sorry we couldn\'t process the payment');
-
-                }
-
-            } catch(Exception $e) {
-                if(!is_null($dealId)) {
-                    $deal = Deal::where('id', $dealId)->first();
-
-                    DealProduct::where('deal_id', $dealId)->delete();
-
-                    if(!is_null($deal)) {
-
-                        $dealPicture = $deal->picture;
-                        $dealDeleted = $deal->delete();
-
-                        if($dealDeleted) {
-                            if($dealPicture) {
-                                $dealPicture = json_decode($dealPicture);
-
-                                if($dealPicture) {
-                                    foreach($dealPicture as $pic) {
-                                        $exp = explode('/', $pic);
-                                        $expImage = $exp[count($exp) - 1];
-
-                                        if(File::exists(public_path('images/deals/'.$expImage)))
-                                        {
-                                            File::delete(public_path('images/deals/'.$expImage));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if(!is_null($dealOrderId)) {
-                    DealOrder::where('id', $dealOrderId)->delete();
-                }
-
-                return redirect()->back()->with('error', 'Sorry something went wrong');
-            }
-
-    }
-
-    public function edit($id) {
-
-        if(is_null($this->checkIfRetailerDeal($id))) {
+        if (is_null($this->checkIfRetailerDeal($id))) {
             return redirect()->route('deals');
         }
 
@@ -223,9 +53,22 @@ class DealsController extends Controller {
 
     }
 
-    public function update(Request $request) {
+    private function checkIfRetailerDeal($dealId)
+    {
+        $businessId = session('business_id');
 
-        if(is_null($this->checkIfRetailerDeal($request->deal_id))) {
+        $deal = Deal::where([
+            ['id', $dealId],
+            ['retailer_id', $businessId]
+        ])->first();
+
+        return $deal;
+    }
+
+    public function update(Request $request)
+    {
+
+        if (is_null($this->checkIfRetailerDeal($request->deal_id))) {
             return redirect()->route('deals');
         }
 
@@ -238,8 +81,8 @@ class DealsController extends Controller {
             'deal_price' => 'required',
         ]);
 
-        if(!is_null($request->product_id) && !is_null($request->product_id_2)) {
-            if($request->product_id == $request->product_id_2) {
+        if (!is_null($request->product_id) && !is_null($request->product_id_2)) {
+            if ($request->product_id == $request->product_id_2) {
                 return redirect()->back()->with('error', 'Deal products must be different');
             }
         }
@@ -252,16 +95,16 @@ class DealsController extends Controller {
 
         $oldPictures = NULL;
 
-        if($request->hasFile('picture')) {
+        if ($request->hasFile('picture')) {
 
             $avatars = $request->file('picture');
             $oldPictures = $deal->picture;
 
-            foreach($avatars as $avatar) {
+            foreach ($avatars as $avatar) {
                 $filename = time() . '.' . $avatar->GetClientOriginalExtension();
 
                 $avatar_img = Image::make($avatar);
-                $avatar_img->resize(373,373)->save(public_path('images/deals/' . $filename));
+                $avatar_img->resize(373, 373)->save(public_path('images/deals/' . $filename));
 
                 $dealPicture = asset("images/deals/" . $filename);
                 array_push($picturePaths, $dealPicture);
@@ -269,7 +112,7 @@ class DealsController extends Controller {
 
         }
 
-        if(count($avatars) > 0) {
+        if (count($avatars) > 0) {
             $deal->picture = json_encode($picturePaths);
         }
 
@@ -278,15 +121,15 @@ class DealsController extends Controller {
 
         $saved = $deal->save();
 
-        if($saved) {
-            if(!is_null($oldPictures)) {
+        if ($saved) {
+            if (!is_null($oldPictures)) {
                 $oldPictures = json_decode($oldPictures);
-                foreach($oldPictures as $pic) {
+                foreach ($oldPictures as $pic) {
                     $exp = explode('/', $pic);
                     $expImage = $exp[count($exp) - 1];
 
-                    if(File::exists(public_path('images/deals/'.$expImage))){
-                        File::delete(public_path('images/deals/'.$expImage));
+                    if (File::exists(public_path('images/deals/' . $expImage))) {
+                        File::delete(public_path('images/deals/' . $expImage));
                     }
                 }
             }
@@ -294,14 +137,14 @@ class DealsController extends Controller {
 
         DealProduct::where('deal_id', $deal->id)->delete();
 
-        if($request->product_id) {
+        if ($request->product_id) {
             DealProduct::create([
                 'deal_id' => $deal->id,
                 'product_id' => $request->product_id
             ]);
         }
 
-        if($request->product_id_2) {
+        if ($request->product_id_2) {
             DealProduct::create([
                 'deal_id' => $deal->id,
                 'product_id' => $request->product_id_2
@@ -312,41 +155,182 @@ class DealsController extends Controller {
 
     }
 
-    public function deletedeal($id) {
+    public function save(Request $request)
+    {
 
-        if(is_null($this->checkIfRetailerDeal($id))) {
-            return redirect()->route('deals');
+        $validated = request()->validate([
+            'title' => 'required',
+            'tier_id' => 'required',
+            'description' => 'required',
+            'deal_price' => 'required',
+            'name_on_card' => 'required|min:2',
+            'cvv' => 'required|numeric|digits:3',
+            'card_number' => 'required|numeric|digits:16',
+            'expiration_month' => 'required',
+            'expiration_year' => 'required'
+        ]);
+
+        if (!is_null($request->product_id) && !is_null($request->product_id_2)) {
+            if ($request->product_id == $request->product_id_2) {
+                return redirect()->back()->with('error', 'Deal products must be different');
+            }
         }
 
-         $deal = Deal::find($id);
+        $tiers = [1, 2, 3];
+        $price = 0;
+        $ending_date = "";
 
-         $oldPictures = $deal->picture;
+        if (!in_array($validated['tier_id'], $tiers)) {
+            return back();
+        }
 
-         $deleted = $deal->delete();
+        if ($validated['tier_id'] == 1) {
 
-         if($deleted) {
+            $ending_date = Carbon::now()->addDays(7)->format('Y-m-d');
+            $price = 50.00;
 
-            if($oldPictures) {
+        } elseif ($validated['tier_id'] == 2) {
 
-                $oldPictures = json_decode($oldPictures);
+            $ending_date = Carbon::now()->addDays(14)->format('Y-m-d');
+            $price = 80.00;
 
-                foreach($oldPictures as $pic) {
+        } elseif ($validated['tier_id'] == 3) {
 
-                    $dexp = explode('/', $pic);
-                    $pic = $dexp[count($dexp) - 1];
+            $ending_date = Carbon::now()->addDays(30)->format('Y-m-d');
+            $price = 140.00;
 
-                    if(File::exists(public_path("images/deals/$pic"))) {
-                        File::delete(public_path("images/deals/$pic"));
+        }
+
+        $starting_date = Carbon::now()->format('Y-m-d');
+
+        $dealId = NULL;
+        $dealOrderId = NULL;
+
+        try {
+
+            $authorizePayment = resolve(AuthorizeService::class);
+            $response = $authorizePayment->chargeCreditCard($validated, $price);
+            $tresponse = $response->getTransactionResponse();
+
+            if ($tresponse != null && $tresponse->getMessages() != null) {
+
+                $deal = new Deal;
+
+                $deal->retailer_id = session('business_id');
+                $deal->title = $request->title;
+
+                $picturePaths = [];
+
+                if ($request->hasFile('picture')) {
+
+                    $avatars = $request->file('picture');
+
+                    foreach ($avatars as $avatar) {
+                        $filename = time() . '.' . $avatar->GetClientOriginalExtension();
+
+                        $avatar_img = Image::make($avatar);
+                        $avatar_img->resize(373, 373)->save(public_path('images/deals/' . $filename));
+
+                        $dealPicture = asset("images/deals/" . $filename);
+                        array_push($picturePaths, $dealPicture);
                     }
 
-                 }
+                }
+
+                $deal->picture = json_encode($picturePaths);
+                $deal->coupon_code = $request->coupon_code;
+                $deal->percentage = $request->percentage;
+                $deal->tier_id = $validated['tier_id'];
+                $deal->deal_price = $validated['deal_price'];
+                $deal->starting_date = $starting_date;
+                $deal->ending_date = $ending_date;
+                $deal->description = $request->description;
+                $deal->is_paid = 1;
+                $deal->save();
+
+                $created = DealOrder::create([
+                    'retailer_id' => session('business_id'),
+                    'deal_id' => $deal->id,
+                    'amount' => $price,
+                    'name_on_card' => $validated['name_on_card'],
+                    'response_code' => $tresponse->getResponseCode(),
+                    'transaction_id' => $tresponse->getTransId(),
+                    'auth_id' => $tresponse->getAuthCode(),
+                    'message_code' => $tresponse->getMessages()[0]->getCode(),
+                    'quantity' => 1,
+                ]);
+
+
+                $dealOrderId = $created->id;
+
+                if ($request->product_id) {
+                    DealProduct::create([
+                        'deal_id' => $deal->id,
+                        'product_id' => $request->product_id
+                    ]);
+                }
+
+                if ($request->product_id_2) {
+                    DealProduct::create([
+                        'deal_id' => $deal->id,
+                        'product_id' => $request->product_id_2
+                    ]);
+                }
+
+                return redirect()->back()->with('info', 'Deal created.');
+
+            } else {
+
+                return redirect()->back()->with('error', 'Sorry we couldn\'t process the payment');
+
             }
 
-            return redirect()->back()->with('info', 'Deal Deleted Successfully.');
+        } catch (Exception $e) {
+            if (!is_null($dealId)) {
+                $deal = Deal::where('id', $dealId)->first();
 
-        } else {
-           return redirect()->back()->with('error', 'Sorry something went wrong.');
+                DealProduct::where('deal_id', $dealId)->delete();
+
+                if (!is_null($deal)) {
+
+                    $dealPicture = $deal->picture;
+                    $dealDeleted = $deal->delete();
+
+                    if ($dealDeleted) {
+                        if ($dealPicture) {
+                            $dealPicture = json_decode($dealPicture);
+
+                            if ($dealPicture) {
+                                foreach ($dealPicture as $pic) {
+                                    $exp = explode('/', $pic);
+                                    $expImage = $exp[count($exp) - 1];
+
+                                    if (File::exists(public_path('images/deals/' . $expImage))) {
+                                        File::delete(public_path('images/deals/' . $expImage));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!is_null($dealOrderId)) {
+                DealOrder::where('id', $dealOrderId)->delete();
+            }
+
+            return redirect()->back()->with('error', 'Sorry something went wrong');
         }
+
+    }
+
+    public function create()
+    {
+
+        $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+        return view('deals.create', [
+            'products' => $products
+        ]);
 
     }
 
@@ -355,15 +339,110 @@ class DealsController extends Controller {
     *
     */
 
-    private function checkIfRetailerDeal($dealId) {
-        $businessId = session('business_id');
+    public function deletedeal($id)
+    {
 
-        $deal = Deal::where([
-            ['id', $dealId],
-            ['retailer_id', $businessId]
-        ])->first();
+        if (is_null($this->checkIfRetailerDeal($id))) {
+            return redirect()->route('deals');
+        }
 
-        return $deal;
+        $deal = Deal::find($id);
+
+        $oldPictures = $deal->picture;
+
+        $deleted = $deal->delete();
+
+        if ($deleted) {
+
+            if ($oldPictures) {
+
+                $oldPictures = json_decode($oldPictures);
+
+                foreach ($oldPictures as $pic) {
+
+                    $dexp = explode('/', $pic);
+                    $pic = $dexp[count($dexp) - 1];
+
+                    if (File::exists(public_path("images/deals/$pic"))) {
+                        File::delete(public_path("images/deals/$pic"));
+                    }
+
+                }
+            }
+
+            return redirect()->back()->with('info', 'Deal Deleted Successfully.');
+
+        } else {
+            return redirect()->back()->with('error', 'Sorry something went wrong.');
+        }
+
+    }
+
+    public function subscription()
+    {
+        $state = DB::table('states')->get();
+        return view('subscription.index', [
+            'state' => $state
+        ]);
+
+    }
+
+    public function getSubscription(Request $request)
+    {
+        $state = DB::table('states')->where('id', '=', $request->id)->first();
+        return response()->json(['success' => $state]);
+
+    }
+
+    public function storeSubscription(Request $request)
+    {
+
+        $validated = request()->validate([
+
+            'state_id' => 'required',
+            'price' => 'required',
+            'name_on_card' => 'required|min:2',
+            'cvv' => 'required|numeric|digits:3',
+            'card_number' => 'required|numeric|digits:16',
+            'expiration_month' => 'required',
+            'expiration_year' => 'required'
+        ]);
+
+
+        $starting_date = Carbon::now()->format('Y-m-d');
+        $price = $request->price;
+
+        $authorizePayment = resolve(AuthorizeService::class);
+        $response = $authorizePayment->chargeCreditCard($validated, $price);
+        $tresponse = $response->getTransactionResponse();
+
+        if ($tresponse != null && $tresponse->getMessages() != null) {
+
+            DB::table('subscription_details')->insert(
+                ['retailer_id' => session('business_id'),
+                    'state_id' => $request->state_id,
+                    'price' => $request->price,
+                    'name_on_card' => $request->name_on_card,
+                    'response_code' => $tresponse->getResponseCode(),
+                    'transaction_id' => $tresponse->getTransId(),
+                    'auth_id' => $tresponse->getAuthCode(),
+                    'message_code' => $tresponse->getMessages()[0]->getCode(),
+                    'type' => 'Dispensaries',
+                    'starting_date' => $starting_date,
+                    'ending_date' => Carbon::now()->addDays(30)->format('Y-m-d'),
+
+                ]
+            );
+
+            return redirect()->back()->with('info', 'Deal created.');
+
+        } else {
+
+            return redirect()->back()->with('error', 'Sorry we couldn\'t process the payment');
+
+        }
+
+
     }
 
 }

@@ -64,6 +64,11 @@
                     <a href="{{ route('accountsettings') }}" class=""><i class="fa fa-user" aria-hidden="true"></i> <span>Account Settings</span></a>
                 </li>
 
+                <li>
+                    <a href="{{ route('subscription') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i> <span>Subscription</span></a>
+                </li>
+
+
             </ul>
 
         </nav>
