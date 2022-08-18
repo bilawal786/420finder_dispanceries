@@ -63,7 +63,7 @@
 
                           <div class="form-group">
                             <label for="deal_price">Deal Price</label>
-                            <input type="number" name="deal_price" id="deal_price" class="form-control" value="{{ $deal->deal_price }}" required>
+                            <input type="number" readonly name="deal_price" id="deal_price" class="form-control" value="{{ $deal->deal_price }}" required>
                           </div>
 
                           <div class="form-group">

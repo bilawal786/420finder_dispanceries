@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Business;
 use App\Models\Deal;
 use App\Models\DealOrder;
 use App\Models\DealProduct;
@@ -160,9 +161,9 @@ class DealsController extends Controller
 
         $validated = request()->validate([
             'title' => 'required',
-            'tier_id' => 'required',
             'description' => 'required',
             'deal_price' => 'required',
+            'state_id' => 'required',
             'name_on_card' => 'required|min:2',
             'cvv' => 'required|numeric|digits:3',
             'card_number' => 'required|numeric|digits:16',
@@ -176,30 +177,9 @@ class DealsController extends Controller
             }
         }
 
-        $tiers = [1, 2, 3];
-        $price = 0;
-        $ending_date = "";
+        $price = $request->deal_price;
+        $ending_date = Carbon::now()->addDays(14)->format('Y-m-d');
 
-        if (!in_array($validated['tier_id'], $tiers)) {
-            return back();
-        }
-
-        if ($validated['tier_id'] == 1) {
-
-            $ending_date = Carbon::now()->addDays(7)->format('Y-m-d');
-            $price = 50.00;
-
-        } elseif ($validated['tier_id'] == 2) {
-
-            $ending_date = Carbon::now()->addDays(14)->format('Y-m-d');
-            $price = 80.00;
-
-        } elseif ($validated['tier_id'] == 3) {
-
-            $ending_date = Carbon::now()->addDays(30)->format('Y-m-d');
-            $price = 140.00;
-
-        }
 
         $starting_date = Carbon::now()->format('Y-m-d');
 
@@ -210,6 +190,7 @@ class DealsController extends Controller
 
             $authorizePayment = resolve(AuthorizeService::class);
             $response = $authorizePayment->chargeCreditCard($validated, $price);
+
             $tresponse = $response->getTransactionResponse();
 
             if ($tresponse != null && $tresponse->getMessages() != null) {
@@ -240,7 +221,6 @@ class DealsController extends Controller
                 $deal->picture = json_encode($picturePaths);
                 $deal->coupon_code = $request->coupon_code;
                 $deal->percentage = $request->percentage;
-                $deal->tier_id = $validated['tier_id'];
                 $deal->deal_price = $validated['deal_price'];
                 $deal->starting_date = $starting_date;
                 $deal->ending_date = $ending_date;
@@ -286,6 +266,7 @@ class DealsController extends Controller
             }
 
         } catch (Exception $e) {
+
             if (!is_null($dealId)) {
                 $deal = Deal::where('id', $dealId)->first();
 
@@ -328,8 +309,14 @@ class DealsController extends Controller
     {
 
         $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+        $state = DB::table('states')->get();
+        $business= Business::where('id','=',session('business_id'))->first();
+        $subPrice = DB::table('states')->where('id','=',$business->state_province)->first();
+
         return view('deals.create', [
-            'products' => $products
+            'products' => $products,
+            'state'=> $state,
+            'subPrice' => $subPrice,
         ]);
 
     }
@@ -381,8 +368,12 @@ class DealsController extends Controller
     public function subscription()
     {
         $state = DB::table('states')->get();
+        $business= Business::where('id','=',session('business_id'))->first();
+        $subPrice = DB::table('states')->where('id','=',$business->state_province)->first();
         return view('subscription.index', [
-            'state' => $state
+            'state' => $state,
+            'business'=>$business,
+            'subPrice'=>$subPrice
         ]);
 
     }

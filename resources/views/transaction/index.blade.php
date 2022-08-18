@@ -37,9 +37,9 @@
                             </thead>
                             <tbody>
                             @if($transaction)
-                                @foreach($transaction as $row)
+                                @foreach($transaction as $key=>$row)
                                 <tr>
-                                    <td>1</td>
+                                    <td>{{$key+1}}</td>
                                     <td>{{ $row->transaction_id }}</td>
                                     <td>{{ $row->name_on_card }}</td>
                                     <td> $ {{ number_format($row->price, 2) }}</td>
@@ -54,6 +54,7 @@
 
                             </tbody>
                         </table>
+                        {{$transaction->links()}}
                     </div>
                 </div>
             </div>

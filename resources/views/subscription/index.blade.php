@@ -16,15 +16,11 @@
             </div>
         </div>
         <?php  $date = DB::table('subscription_details')->orderBy('id', 'DESC')->where('retailer_id', '=', session('business_id'))->first();
-
-        if ($date) {
-            $state_name = DB::table('states')->where('id', '=', $date->state_id)->first();
-            $currentDate = date('Y-m-d');
-            $currentDate = date('Y-m-d', strtotime($currentDate));
-            $startDate = date('Y-m-d', strtotime($date->starting_date));
-            $endDate = date('Y-m-d', strtotime($date->ending_date));
-
-        }
+        $state_name = DB::table('states')->where('id', '=', $date->state_id ?? 1)->first();
+        $currentDate = date('Y-m-d');
+        $currentDate = date('Y-m-d', strtotime($currentDate));
+        $startDate = date('Y-m-d', strtotime($date->starting_date ?? '12-2-2021'));
+        $endDate = date('Y-m-d', strtotime($date->ending_date ?? '12-2-2021'));
         ?>
         @if(($currentDate >= $startDate) && ($currentDate <= $endDate))
             <section class="pb-0">
@@ -94,27 +90,28 @@
                             @csrf
 
 
-                            <div class="form-group">
+                            <div class="form-group" style="display: none">
                                 <label for="product">State</label>
                                 <select name="state_id" id="state_id" class="form-control"
-                                        style="margin-bottom: 1.2rem;">
+                                        style="margin-bottom: 1.2rem;" disabled>
                                     <option value="">Select State</option>
                                     @foreach ($state as $row)
-                                        <option value="{{ $row->id }}">{{ $row->name }}</option>
+                                        <option value="{{ $row->id }}" > {{ $row->name }}</option>
                                     @endforeach
                                 </select>
 
 
                             </div>
+
                             <div class="row">
-                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub" style="display: none">
+                                @if($subPrice)
+                                <input type="hidden" name="state_id" value="{{$subPrice->id}}">
+                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub" >
                                     <label for="deal_price">Subscription Price</label>
-                                    <input type="number" name="price" id="price" class="form-control" required
-                                           value="{{ old('price') }}" readonly>
+                                    <input type="number" name="price"  id="price" class="form-control" required
+                                           value="{{$subPrice->sub_price}}" readonly>
                                 </div>
-                                <div class="form-group col-xs-12 col-sm-12 mb-3" id="description" style="display: none">
-                                    <h5 style="color: red">Your State is Not Eligible</h5>
-                                </div>
+
 
 
                             </div>
@@ -165,6 +162,11 @@
                             <div class="form-group">
                                 <button class="btn btn-dark btn-block" id="create-deal-btn">Subscribe</button>
                             </div>
+                            @else
+                                <div class="form-group col-xs-12 col-sm-12 mb-3" id="description">
+                                    <h4 style="color: red;text-align: center;">Your State is Not Eligible</h4>
+                                </div>
+                            @endif
                         </form>
                     </div>
                 </div>
