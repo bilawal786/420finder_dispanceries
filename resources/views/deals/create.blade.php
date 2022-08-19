@@ -22,6 +22,7 @@
                 @include('partials.success-error')
 
                 <div class="col-md-12">
+                    @if($subPrice)
                     <form action="{{ route('savedeal') }}" method="POST" enctype="multipart/form-data"
                           id="create-deal-form">
                         @csrf
@@ -66,25 +67,13 @@
                                     @endforeach
                                 </select>
                             </div>
-                            @if($subPrice)
+
                                 <input type="hidden" name="state_id"  value="{{$subPrice->id}}">
                                 <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub">
                                     <label for="deal_price">Deal Price</label>
                                     <input type="number" readonly name="deal_price" id="deal_price" class="form-control"
                                            required value="{{ $subPrice->deal_price }}">
                                 </div>
-                            @else
-                                <div class="form-group col-xs-12 col-sm-6 mb-3" >
-                                    <label for="deal_price">State</label>
-                                    <input type="text"  name="state_id"  id="state_id" class="form-control"
-                                           required value="">
-                                </div>
-                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub">
-                                    <label for="deal_price">Deal Price</label>
-                                    <input type="number"  name="deal_price" id="deal_price" class="form-control"
-                                           required value="">
-                                </div>
-                            @endif
 
                         </div>
 
@@ -164,6 +153,11 @@
                             <button class="btn btn-dark btn-block" id="create-deal-btn">Create Deal</button>
                         </div>
                     </form>
+                    @else
+                        <div class="form-group col-xs-12 col-sm-12 mb-3" id="description">
+                            <h4 style="color: red;text-align: center;">Your State is Not Eligible</h4>
+                        </div>
+                    @endif
                 </div>
 
             </div>
