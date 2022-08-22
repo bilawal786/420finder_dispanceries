@@ -1,20 +1,20 @@
 <style>
-    blink {
+     .txt{
         animation: 2s linear infinite condemned_blink_effect;
         color: red;
         font-size: 15px;
     }
-    @keyframes condemned_blink_effect {
-        0% {
-            visibility: hidden;
-        }
-        50% {
-            visibility: hidden;
-        }
-        100% {
-            visibility: visible;
-        }
-    }
+    /*@keyframes condemned_blink_effect {*/
+    /*    0% {*/
+    /*        visibility: hidden;*/
+    /*    }*/
+    /*    50% {*/
+    /*        visibility: hidden;*/
+    /*    }*/
+    /*    100% {*/
+    /*        visibility: visible;*/
+    /*    }*/
+    /*}*/
 
 </style>
 <nav class="navbar navbar-default navbar-fixed-top">
@@ -41,12 +41,33 @@
             $currentDate = date('Y-m-d', strtotime($currentDate));
             $startDate = date('Y-m-d', strtotime($date->starting_date ?? '12-2-2021'));
             $endDate = date('Y-m-d', strtotime($date->ending_date ?? '12-2-2021'));
+            $check = DB::table('businesses')->where('id', '=', session('business_id'))->where('latitude','=',null)->where('longitude','=',null)->first();
+            $details = DB::table('details')->where('business_id', '=', session('business_id'))->where('about', '=', null)->where('introduction', '=', null)->where('customers','=',null)->where('announcement','=',null)->first();
+
             ?>
             @if(($currentDate >= $startDate) && ($currentDate <= $endDate))
+
+                    <div class="navbar-btn">
+                        @if($check)
+                        <p class="txt"><b>Please Update Your Profile. <a href="{{route('accountsettings')}}">Click Here</a> </b></p>
+                        @endif
+                        @if($details)
+                        <p class="txt"><b>Please Add Details. <a href="{{route('detail.index')}}">Click Here</a> </b></p>
+                        @endif
+
+                    </div>
+
             @else
                 <div class="navbar-btn">
-                    <blink>You dont have any subscription your product menu is no more available on website. <a href="{{route('subscription')}}">Please purchase a subscription</a></blink>
+                    <p class="txt"><b>You dont have any subscription your product menu is no more available on website. <a href="{{route('subscription')}}">Please purchase a subscription</a></b></p>
+                    @if($check)
+                        <p class="txt"><b>Please Update Your Profile. <a href="{{route('accountsettings')}}">Click Here</a> </b></p>
+                    @endif
+                    @if($details)
+                        <p class="txt"><b>Please Add Details. <a href="{{route('detail.index')}}">Click Here</a> </b></p>
+                    @endif
                 </div>
+
             @endif
 
         <div id="navbar-menu">
