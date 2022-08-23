@@ -48,24 +48,34 @@
             @if(($currentDate >= $startDate) && ($currentDate <= $endDate))
 
                     <div class="navbar-btn">
-                        @if($check)
-                        <p class="txt"><b>Please Update Your Profile. <a href="{{route('accountsettings')}}">Click Here</a> </b></p>
-                        @endif
-                        @if($details)
-                        <p class="txt"><b>Please Add Details. <a href="{{route('detail.index')}}">Click Here</a> </b></p>
-                        @endif
+
+                        <p class="txt"><b>
+                                @if($check )
+                                Please Update Your Profile. <a href="{{route('accountsettings')}}">Click Here</a>
+                                @endif
+                                @if($details)
+                                Please Add Details. <a href="{{route('detail.index')}}">Click Here</a>
+                                @endif
+                            </b>
+                        </p>
+
+
 
                     </div>
 
             @else
                 <div class="navbar-btn">
-                    <p class="txt"><b>You dont have any subscription your product menu is no more available on website. <a href="{{route('subscription')}}">Please purchase a subscription</a></b></p>
-                    @if($check)
-                        <p class="txt"><b>Please Update Your Profile. <a href="{{route('accountsettings')}}">Click Here</a> </b></p>
-                    @endif
-                    @if($details)
-                        <p class="txt"><b>Please Add Details. <a href="{{route('detail.index')}}">Click Here</a> </b></p>
-                    @endif
+                    <p class="txt"><b>
+                            You dont have any subscription your product menu is no more available on website. <a href="{{route('subscription')}}">Please purchase a subscription</a>
+                            @if($check)
+                                Please Update Your Profile. <a href="{{route('accountsettings')}}">Click Here</a>
+                            @endif
+                            @if($details)
+                                Please Add Details. <a href="{{route('detail.index')}}">Click Here</a>
+                            @endif
+                        </b>
+                    </p>
+
                 </div>
 
             @endif
