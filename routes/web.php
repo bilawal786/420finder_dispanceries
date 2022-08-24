@@ -332,7 +332,30 @@ Route::group(['namespace' =>'App\Http\Controllers', 'middleware' => ['checkIfAut
 
     ]);
 
+    Route::get('/marketing/{id}', [
 
+        'uses' => 'DealsController@marketing',
+        'as' => 'marketing'
+
+    ]);
+    Route::get('/state/areas', [
+
+        'uses' => 'DealsController@stateArea',
+        'as' => 'state.areas'
+
+    ]);
+    Route::get('/bookme/{id}/{price}/{p}', [
+
+        'uses' => 'DealsController@bookMe',
+        'as' => 'bookme'
+
+    ]);
+    Route::post('/banner/payment', [
+
+        'uses' => 'DealsController@bannerPaymant',
+        'as' => 'banner.payment'
+
+    ]);
 
 
 });
