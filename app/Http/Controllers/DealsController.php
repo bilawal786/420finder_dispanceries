@@ -310,12 +310,12 @@ class DealsController extends Controller
 
         $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
         $state = DB::table('states')->get();
-        $business= Business::where('id','=',session('business_id'))->first();
-        $subPrice = DB::table('states')->where('id','=',$business->state_province)->first();
+        $business = Business::where('id', '=', session('business_id'))->first();
+        $subPrice = DB::table('states')->where('id', '=', $business->state_province)->first();
 
         return view('deals.create', [
             'products' => $products,
-            'state'=> $state,
+            'state' => $state,
             'subPrice' => $subPrice,
         ]);
 
@@ -368,12 +368,12 @@ class DealsController extends Controller
     public function subscription()
     {
         $state = DB::table('states')->get();
-        $business= Business::where('id','=',session('business_id'))->first();
-        $subPrice = DB::table('states')->where('id','=',$business->state_province)->first();
+        $business = Business::where('id', '=', session('business_id'))->first();
+        $subPrice = DB::table('states')->where('id', '=', $business->state_province)->first();
         return view('subscription.index', [
             'state' => $state,
-            'business'=>$business,
-            'subPrice'=>$subPrice
+            'business' => $business,
+            'subPrice' => $subPrice
         ]);
 
     }
@@ -419,7 +419,7 @@ class DealsController extends Controller
                     'auth_id' => $tresponse->getAuthCode(),
                     'message_code' => $tresponse->getMessages()[0]->getCode(),
                     'type' => 'Dispensaries',
-                    'starting_date' => $starting_date,
+                    'starting_date' => $starting_date->date,
                     'ending_date' => Carbon::now()->addDays(30)->format('Y-m-d'),
 
                 ]
@@ -433,6 +433,99 @@ class DealsController extends Controller
 
         }
 
+
+    }
+
+    public function stateArea()
+    {
+        $business = Business::where('id', '=', session('business_id'))->first();
+
+        $area = DB::table('areas')->where('state_id', '=', $business->state_province)->get();
+
+        return view('marketing.main', compact('area', 'business'));
+    }
+
+    public function marketing($id)
+    {
+        $business = Business::where('id', '=', session('business_id'))->first();
+        $area = DB::table('areas')->find($id);
+        $position = DB::table('position_sets')->where('area_id','=',$id)->where('date','=',Carbon::now()->addMonth(1)->format('m, Y'))->pluck('position')->toArray();;
+
+        return view('marketing.index', compact('business', 'area','position'));
+//        $distance = DB::table('areas')->selectRaw("id,
+//                         ( 3956   * acos( cos( radians(?) ) *
+//                           cos( radians( latitude ) )
+//                           * cos( radians( longitude ) - radians(?)
+//                           ) + sin( radians(?) ) *
+//                           sin( radians( latitude ) ) )
+//                         ) AS distance", [$latitude, $longitude, $latitude])
+//            ->having("distance", "<", $radius)
+//            ->orderBy("distance", 'asc')
+//            ->first();
+
+    }
+
+    public function bookMe($id,$price,$p)
+    {
+        $area = DB::table('areas')->find($id);
+        return view('marketing.payment', compact('area','price','p'));
+
+    }
+    public function bannerPaymant(Request $request)
+    {
+        $validated = request()->validate([
+            'price' => 'required',
+            'name_on_card' => 'required|min:2',
+            'cvv' => 'required|numeric|digits:3',
+            'card_number' => 'required|numeric|digits:16',
+            'expiration_month' => 'required',
+            'expiration_year' => 'required'
+        ]);
+
+
+        $starting_date = Carbon::now()->addMonth(1)->format('m, Y');
+        $price = $request->price;
+
+        $authorizePayment = resolve(AuthorizeService::class);
+        $response = $authorizePayment->chargeCreditCard($validated, $price);
+        $tresponse = $response->getTransactionResponse();
+
+        if ($tresponse != null && $tresponse->getMessages() != null) {
+
+            DB::table('banner_paymants')->insert(
+                ['retailer_id' => session('business_id'),
+                    'area_id' => $request->area_id,
+                    'price' => $request->price,
+                    'description' => $request->description,
+                    'name_on_card' => $request->name_on_card,
+                    'response_code' => $tresponse->getResponseCode(),
+                    'transaction_id' => $tresponse->getTransId(),
+                    'auth_id' => $tresponse->getAuthCode(),
+                    'message_code' => $tresponse->getMessages()[0]->getCode(),
+                    'starting_date' => $starting_date,
+                    'ending_date' => Carbon::now()->addMonth(2)->format('m, Y'),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+
+                ]
+            );
+            DB::table('position_sets')->insert(
+                [
+                    'area_id' => $request->area_id,
+                    'position' => $request->position,
+                    'date' => Carbon::now()->addMonth(1)->format('m, Y'),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
+                ]
+            );
+
+            return redirect()->back()->with('info', 'Position Booked.');
+
+        } else {
+
+            return redirect()->back()->with('error', 'Sorry we couldn\'t process the payment');
+
+        }
 
     }
 
