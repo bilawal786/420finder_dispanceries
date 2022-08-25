@@ -21,10 +21,13 @@
                         <div class="col-md-6">
                           <h4><strong>Select Your Directions</strong></h4>
                         </div>
-                        <div class="col-md-6 text-center">
-
-                          <button onclick="getLocation()" class="btn btn-info">Click to add your directions</button>
-
+                        <div class="col-md-6">
+{{--                            text-center--}}
+                            <div class="form-group">
+                                <label for="">Directions</label>
+                                <input id="searchTextField" type="text" name="address" class="form-control" value="{{$location}}">
+                            </div>
+{{--                          <button onclick="getLocation()" class="btn btn-info">Click to add your directions</button>--}}
                         </div>
                       </div>
                     </div>
@@ -269,6 +272,9 @@
                           <h4><strong>State / Province</strong></h4>
                           <p class="text-black-50">{{ $business->state_province }}</p>
                         </div>
+                          <div class="col-md-6 text-right">
+                              <a data-toggle="modal" data-target="#stateupdate" class="cursor-pointer">Edit</a>
+                          </div>
                       </div>
                     </div>
                   </div>
@@ -659,7 +665,39 @@
       </div>
     </div>
   </div>
-
+                <!-- Address Line 1 -->
+                <div class="modal fade" id="stateupdate" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="{{ route('updateaddressone') }}" method="POST">
+                                @csrf
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <h4><strong>Update Address Line 1</strong></h4>
+                                        </div>
+                                        <div class="col-md-6 text-right pt-2 pe-3">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        </div>
+                                    </div>
+                                    <div class="row my-3">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="">Address Line 1</label>
+                                                <input type="text" name="address_line_1" value="{{ $business->address_line_1 }}" placeholder="Enter Address Line 1" class="form-control" required="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-primary btn-block">Save</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
   <!-- website -->
   <div class="modal fade" id="website" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">

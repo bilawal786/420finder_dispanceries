@@ -473,6 +473,7 @@ class DealsController extends Controller
     }
     public function bannerPaymant(Request $request)
     {
+        $id = request()->id;
         $validated = request()->validate([
             'price' => 'required',
             'name_on_card' => 'required|min:2',
@@ -483,7 +484,8 @@ class DealsController extends Controller
         ]);
 
 
-        $starting_date = Carbon::now()->addMonth(1)->format('m, Y');
+        $starting_date = Carbon::now()->addMonth(1)->format('y-m-01');
+        $ending_date = Carbon::now()->addMonth(1)->format('Y-m-t');
         $price = $request->price;
 
         $authorizePayment = resolve(AuthorizeService::class);
@@ -492,7 +494,7 @@ class DealsController extends Controller
 
         if ($tresponse != null && $tresponse->getMessages() != null) {
 
-            DB::table('banner_paymants')->insert(
+            $getid = DB::table('banner_paymants')->insertGetId(
                 ['retailer_id' => session('business_id'),
                     'area_id' => $request->area_id,
                     'price' => $request->price,
@@ -503,7 +505,7 @@ class DealsController extends Controller
                     'auth_id' => $tresponse->getAuthCode(),
                     'message_code' => $tresponse->getMessages()[0]->getCode(),
                     'starting_date' => $starting_date,
-                    'ending_date' => Carbon::now()->addMonth(2)->format('m, Y'),
+                    'ending_date' => $ending_date,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now(),
 
@@ -511,6 +513,7 @@ class DealsController extends Controller
             );
             DB::table('position_sets')->insert(
                 [
+                    'b_payment_id'=>$getid,
                     'area_id' => $request->area_id,
                     'position' => $request->position,
                     'date' => Carbon::now()->addMonth(1)->format('m, Y'),
@@ -519,7 +522,8 @@ class DealsController extends Controller
                 ]
             );
 
-            return redirect()->back()->with('info', 'Position Booked.');
+//            return redirect()->back()->with('info', 'Position Booked.');
+            return redirect()->route('marketing', ['id' => $id])->with('info', 'Position Booked.');
 
         } else {
 

@@ -59,9 +59,9 @@
                 </li>
 
 
-                <li>
-                    <a href="{{ route('otherlocations') }}" class=""><i class="fa fa-sort" aria-hidden="true"></i> <span>Other Store Locations</span></a>
-                </li>
+{{--                <li>--}}
+{{--                    <a href="{{ route('otherlocations') }}" class=""><i class="fa fa-sort" aria-hidden="true"></i> <span>Other Store Locations</span></a>--}}
+{{--                </li>--}}
 
                 <li>
                     <a href="{{ route('accountsettings') }}" class=""><i class="fa fa-user" aria-hidden="true"></i> <span>Account Settings</span></a>

@@ -17,9 +17,16 @@
     @if($area)
         <div class="panel panel-headline">
             <div class="panel-heading">
-                <?php  $state = DB::table('states')->find($business->state_province);?>
+                <?php
+                $state = DB::table('states')->find($business->state_province);
+                if($state == null){
+                    $StateName = 'No State';
+                }else{
+                    $StateName = $state->name;
+                }
+                ?>
 
-                <h3 class="panel-title" style="text-align: center">{{$state->name}} </h3>
+                <h3 class="panel-title" style="text-align: center">{{$StateName}} </h3>
             </div>
             <div class="panel-body">
                 <div class="row">

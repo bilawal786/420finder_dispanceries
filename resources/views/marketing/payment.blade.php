@@ -18,7 +18,7 @@
             <div class="row">
                 @include('partials.success-error')
                 <div class="col-md-12">
-                    <form action="{{ route('banner.payment') }}" method="POST" enctype="multipart/form-data"
+                    <form action="{{ route('banner.payment', ['id'=>request()->route('id')]) }}" method="POST" enctype="multipart/form-data"
                           id="create-deal-form">
                         @csrf
                         <div class="row">
