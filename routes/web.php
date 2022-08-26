@@ -89,6 +89,12 @@ Route::group(['namespace' =>'App\Http\Controllers', 'middleware' => ['checkIfAut
         'as' => 'accountsettings'
 
     ]);
+    Route::post('/updateState', [
+
+        'uses' => 'AccountController@updateState',
+        'as' => 'updateState'
+
+    ]);
 
     Route::post('/savefirstname', [
 
