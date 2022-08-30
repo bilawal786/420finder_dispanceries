@@ -14,7 +14,7 @@
                         $text = DB::table('tests')->first();
                     @endphp
                     <h4>
-                        {{$text->dis_product}}
+                        {!! $text->dis_product !!}
                     </h4>
                 </div>
             </div>

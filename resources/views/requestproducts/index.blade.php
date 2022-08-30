@@ -10,7 +10,7 @@
                         $text = DB::table('tests')->first();
                     @endphp
                     <h4>
-                        {{$text->dis_request_product}}
+                        {!! $text->dis_request_product !!}
                     </h4>
                 </div>
             </div>

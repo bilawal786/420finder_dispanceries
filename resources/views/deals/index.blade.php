@@ -9,7 +9,7 @@
                         $text = DB::table('tests')->first();
                     @endphp
                     <h4>
-                        {{$text->dis_deal}}
+                        {!! $text->dis_deal !!}
                     </h4>
                 </div>
             </div>
