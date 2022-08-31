@@ -83,6 +83,8 @@ Route::group(['namespace' =>'App\Http\Controllers', 'middleware' => ['checkIfAut
     // AJAX CALL
     Route::post('/gettypesubcat', 'ProductController@gettypesubcat')->name('gettypesubcat');
 
+    Route::resource('gallery','GalleryController' );
+
     Route::get('/account-settings', [
 
         'uses' => 'AccountController@index',
