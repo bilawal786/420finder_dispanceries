@@ -42,6 +42,8 @@
 
     <link href="{{asset('jquery.growl.css')}}" rel="stylesheet" type="text/css">
     <link href="{{asset('src/fileup.css')}}" rel="stylesheet" type="text/css">
+
+
     <style>
         .dropzone {
             background-color: #ccc;
@@ -63,8 +65,6 @@
             padding-top: 60px;
         }
     </style>
-
-
 
 
 
@@ -325,7 +325,8 @@
   <script>
 
       $.fileup({
-          url: 'https://github.com?file_upload=1',
+          url: '{{route('gallery.store')}}',
+          token: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
           inputID: 'upload-3',
           queueID: 'upload-3-queue',
           autostart: true,
