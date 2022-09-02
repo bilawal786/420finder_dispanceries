@@ -419,7 +419,7 @@ class DealsController extends Controller
                     'auth_id' => $tresponse->getAuthCode(),
                     'message_code' => $tresponse->getMessages()[0]->getCode(),
                     'type' => 'Dispensaries',
-                    'starting_date' => $starting_date->date,
+                    'starting_date' => $starting_date,
                     'ending_date' => Carbon::now()->addDays(30)->format('Y-m-d'),
 
                 ]

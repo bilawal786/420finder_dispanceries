@@ -56,15 +56,10 @@
                                                 <td>{{$date->transaction_id}}</td>
                                                 <td>{{$state_name->name}}</td>
                                                 <td>$ {{$date->price}}</td>
-                                                @if($date->status==1)
+
                                                     <td>
                                                         <span class="btn-dark">Activate</span>
                                                     </td>
-                                                @else
-                                                    <td>
-                                                        <span class="btn-danger">Not Activate</span>
-                                                    </td>
-                                                @endif
 
                                                 <td>{{date("m-d-Y", strtotime($date->starting_date)) . '- ' .date("m-d-Y", strtotime($date->ending_date)) }}</td>
 
