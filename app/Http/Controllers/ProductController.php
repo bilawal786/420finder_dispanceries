@@ -51,7 +51,6 @@ class ProductController extends Controller
 
     public function productrequests()
     {
-
 //        if (is_null($this->checkIfPaid())) {
 //            return $this->redirectToPayment();
 //        }
@@ -63,31 +62,34 @@ class ProductController extends Controller
         return view('requestproducts.index')
             ->with('brands', $brands)
             ->with('requests', $requests);
-
     }
 
     public function getrproducts(Request $request)
     {
 
         $brand_id = $request->brand_id;
+        $bran = request()->brand;
 
         $products = BrandProduct::where('brand_id', $brand_id)
             ->select('id', 'name')
             ->get();
 
-        $data = '
-                    <option value="">Select</option>
-                ';
+
+        $data = '<option value="">Select</option>';
 
         foreach ($products as $product) {
 
-            $data .= '
-                <option value="' . $product["id"] . '">' . $product["name"] . '</option>
-            ';
+                $checkbrand = DispenseryProduct::where('dispensery_id', $bran)->where('brand_product_id', $product["id"])->get();
+
+                if(count($checkbrand) == 0){
+                    $data .= '<option value="' . $product["id"] . '">' . $product["name"] . '</option>';
+                }
 
         }
+//        $checkbrand = DispenseryProduct::where('dispensery_id', request()->brand)->where('verify', 1)->where('brand_product_id', 10)->get();
 
         echo $data;
+
 
     }
 
@@ -143,7 +145,6 @@ class ProductController extends Controller
             ->with('gallery', $gallery)
             ->with('strains', $strains)
             ->with('genetics', $genetics);
-
     }
 
     /*
