@@ -25,9 +25,12 @@ class DealsController extends Controller
     {
 
         $deals = Deal::where('retailer_id', session('business_id'))->latest()->get();
+        $deal_wallet=Business::where('id', session('business_id'))->select('deal_wallet')->first();
+
 
         return view('deals.index')
-            ->with('deals', $deals);
+            ->with('deals', $deals)
+            ->with('deal_wallet', $deal_wallet);
 
     }
 
@@ -304,7 +307,133 @@ class DealsController extends Controller
         }
 
     }
+    public function free(Request $request)
+    {
 
+        $validated = request()->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'state_id' => 'required',
+        ]);
+
+
+        if (!is_null($request->product_id) && !is_null($request->product_id_2)) {
+            if ($request->product_id == $request->product_id_2) {
+                return redirect()->back()->with('error', 'Deal products must be different');
+            }
+        }
+
+        $price = $request->deal_price;
+        $ending_date = Carbon::now()->addDays(14)->format('Y-m-d');
+
+        $starting_date = Carbon::now()->format('Y-m-d');
+        $dealId = NULL;
+        $getbusiness = Business::where('id', session('business_id'))->first();
+        if($getbusiness->deal_wallet >0){
+
+        }else{
+            return redirect()->back()->with('error', 'Sorry something went wrong');
+        }
+
+        try {
+
+                $deal = new Deal;
+
+                $deal->retailer_id = session('business_id');
+                $deal->title = $request->title;
+
+                $picturePaths = [];
+
+                if ($request->hasFile('picture')) {
+
+                    $avatars = $request->file('picture');
+
+                    foreach ($avatars as $avatar) {
+                        $filename = time() . '.' . $avatar->GetClientOriginalExtension();
+
+                        $avatar_img = Image::make($avatar);
+                        $avatar_img->resize(373, 373)->save(public_path('images/deals/' . $filename));
+
+                        $dealPicture = asset("images/deals/" . $filename);
+                        array_push($picturePaths, $dealPicture);
+                    }
+
+                }
+
+                $deal->picture = json_encode($picturePaths);
+                $deal->coupon_code = $request->coupon_code;
+                $deal->percentage = $request->percentage;
+                $deal->deal_price ='free';
+                $deal->starting_date = $starting_date;
+                $deal->ending_date = $ending_date;
+                $deal->description = $request->description;
+                $deal->is_paid = 1;
+                $deal->save();
+
+
+
+                if ($request->product_id) {
+                    DealProduct::create([
+                        'deal_id' => $deal->id,
+                        'product_id' => $request->product_id
+                    ]);
+                }
+
+                if ($request->product_id_2) {
+                    DealProduct::create([
+                        'deal_id' => $deal->id,
+                        'product_id' => $request->product_id_2
+                    ]);
+                }
+
+
+
+
+                if($getbusiness->deal_wallet >0){
+                    $business = DB::table('businesses')->where('id', session('business_id'))->update([
+                        'deal_wallet' => $getbusiness->deal_wallet-1
+                    ]);
+                }
+
+                return redirect()->back()->with('info', 'Deal created.');
+
+
+
+        } catch (Exception $e) {
+
+            if (!is_null($dealId)) {
+                $deal = Deal::where('id', $dealId)->first();
+
+                DealProduct::where('deal_id', $dealId)->delete();
+
+                if (!is_null($deal)) {
+
+                    $dealPicture = $deal->picture;
+                    $dealDeleted = $deal->delete();
+
+                    if ($dealDeleted) {
+                        if ($dealPicture) {
+                            $dealPicture = json_decode($dealPicture);
+
+                            if ($dealPicture) {
+                                foreach ($dealPicture as $pic) {
+                                    $exp = explode('/', $pic);
+                                    $expImage = $exp[count($exp) - 1];
+
+                                    if (File::exists(public_path('images/deals/' . $expImage))) {
+                                        File::delete(public_path('images/deals/' . $expImage));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return redirect()->back()->with('error', 'Sorry something went wrong');
+        }
+
+    }
     public function create()
     {
 
@@ -314,6 +443,21 @@ class DealsController extends Controller
         $subPrice = DB::table('states')->where('id', '=', $business->state_province)->first();
 
         return view('deals.create', [
+            'products' => $products,
+            'state' => $state,
+            'subPrice' => $subPrice,
+        ]);
+
+    }
+    public function freeDeal()
+    {
+
+        $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+        $state = DB::table('states')->get();
+        $business = Business::where('id', '=', session('business_id'))->first();
+        $subPrice = DB::table('states')->where('id', '=', $business->state_province)->first();
+
+        return view('deals.freeDeal', [
             'products' => $products,
             'state' => $state,
             'subPrice' => $subPrice,
@@ -421,9 +565,13 @@ class DealsController extends Controller
                     'type' => 'Dispensaries',
                     'starting_date' => $starting_date,
                     'ending_date' => Carbon::now()->addDays(30)->format('Y-m-d'),
-
                 ]
             );
+            $getbusiness = Business::where('id', session('business_id'))->first();
+            DB::table('businesses')->where('id', session('business_id'))->update([
+                'deal_wallet' => $getbusiness->deal_wallet+2
+            ]);
+
 
             return redirect()->back()->with('info', 'Deal created.');
 

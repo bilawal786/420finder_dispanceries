@@ -290,6 +290,18 @@ Route::group(['namespace' =>'App\Http\Controllers', 'middleware' => ['checkIfAut
         'as' => 'addnewdeal'
 
     ]);
+    Route::get('/deals/free/deal', [
+
+        'uses' => 'DealsController@freeDeal',
+        'as' => 'freeDeal'
+
+    ]);
+    Route::post('/deals/free/save', [
+
+        'uses' => 'DealsController@free',
+        'as' => 'freeDealsave'
+
+    ]);
 
     Route::post('/deals/save', [
 
