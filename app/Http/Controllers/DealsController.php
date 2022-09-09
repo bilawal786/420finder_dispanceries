@@ -165,7 +165,7 @@ class DealsController extends Controller
         $validated = request()->validate([
             'title' => 'required',
             'description' => 'required',
-            'deal_price' => 'required',
+            'deal_price' => 'required|numeric|min:1',
             'state_id' => 'required',
             'name_on_card' => 'required|min:2',
             'cvv' => 'required|numeric|digits:3',
@@ -314,6 +314,7 @@ class DealsController extends Controller
             'title' => 'required',
             'description' => 'required',
             'state_id' => 'required',
+            'deal_price' => 'required|numeric|min:1',
         ]);
 
 
@@ -363,7 +364,7 @@ class DealsController extends Controller
                 $deal->picture = json_encode($picturePaths);
                 $deal->coupon_code = $request->coupon_code;
                 $deal->percentage = $request->percentage;
-                $deal->deal_price ='free';
+                $deal->deal_price = $validated['deal_price'];
                 $deal->starting_date = $starting_date;
                 $deal->ending_date = $ending_date;
                 $deal->description = $request->description;
