@@ -192,7 +192,7 @@
 
                                         <tbody>
                                             @foreach ($products as $product)
-                                             <?php $total = $total + $product->price; ?>
+                                             <?php $total = $total + $product->price * $product->qty; ?>
                                               <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>
