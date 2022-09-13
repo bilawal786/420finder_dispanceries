@@ -33,7 +33,9 @@ class AdminController extends Controller {
         ->pluck('count')
         ->toArray();
         $totalDeals = Deal::where('retailer_id', session('business_id'))->count();
-        $totalOrders = Order::where('retailer_id', session('business_id'))->count();
+        $neworders = Order::where('retailer_id', session('business_id'))->where('status', 'Submitted')->count();
+        $acceptorders = Order::where('retailer_id', session('business_id'))->where('status', 'Accepted')->count();
+        $reviews = Business::where('id', session('business_id'))->select('reviews_count')->first();
         $visitor = DB::table('visitors')->where('business_id', session('business_id'))->count();
 
         $subscription = DB::table('subscription_details')->orderBy('id', 'DESC')->where('retailer_id', '=', session('business_id'))->first();
@@ -90,6 +92,7 @@ class AdminController extends Controller {
 
         $deal_wallet=Business::where('id', session('business_id'))->select('deal_wallet')->first();
 
+
         return view('index', [
             'deals' => $deals,
             'chart' => $chart,
@@ -98,7 +101,9 @@ class AdminController extends Controller {
             'totalSales' => $totalSales,
             'pieChart' => $pieChart,
             'totalDeals' => $totalDeals,
-            'totalOrders' => $totalOrders,
+            'neworders' => $neworders,
+            'acceptorders' => $acceptorders,
+            'reviews'=>$reviews->reviews_count,
             'visitor' => $visitor,
             'sub' => $sub,
             'freedeals' => $deal_wallet,
