@@ -320,7 +320,8 @@ class ProductController extends Controller
             'sku' => 'required',
             'suggested_price' => 'required',
             'category_id' => 'required',
-            'galleryimages' => 'required'
+//            'galleryimages' => 'required'
+
         ]);
 
         $product = new DispenseryProduct;
@@ -391,23 +392,23 @@ class ProductController extends Controller
 
         if ($product->save()) {
 
-            if ($request->hasFile('galleryimages')) {
-
-                foreach ($request->file('galleryimages') as $image) {
-
-                    $name = $image->getClientOriginalName();
-                    $name = $UUID . '-' . $name;
-                    $image->move(public_path('images/dispensery/products/gallery'), $name);
-
-                    $dpg = new DispenseryProductGallery;
-
-                    $dpg->dispensery_product_id = $product->id;
-                    $dpg->image = asset("images/dispensery/products/gallery/" . $name);
-                    $dpg->save();
-
-                }
-
-            }
+//            if ($request->hasFile('galleryimages')) {
+//
+//                foreach ($request->file('galleryimages') as $image) {
+//
+//                    $name = $image->getClientOriginalName();
+//                    $name = $UUID . '-' . $name;
+//                    $image->move(public_path('images/dispensery/products/gallery'), $name);
+//
+//                    $dpg = new DispenseryProductGallery;
+//
+//                    $dpg->dispensery_product_id = $product->id;
+//                    $dpg->image = asset("images/dispensery/products/gallery/" . $name);
+//                    $dpg->save();
+//
+//                }
+//
+//            }
 
             return redirect()->route('products')->with('info', 'Product Created.');
 
@@ -612,37 +613,37 @@ class ProductController extends Controller
                 }
             }
 
-            if ($request->hasFile('galleryimages')) {
-                $dispensaryGalleryImgs = DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->get();
-                DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->delete();
-
-                foreach ($request->file('galleryimages') as $image) {
-
-                    $name = $image->getClientOriginalName();
-                    $name = $UUID . '-' . $name;
-                    $image->move(public_path('images/dispensery/products/gallery'), $name);
-
-                    $bpg = new DispenseryProductGallery;
-
-                    $bpg->dispensery_product_id = $product->id;
-                    $bpg->image = asset("images/dispensery/products/gallery/" . $name);
-                    $bpg->save();
-
-                }
-
-                // DELETE PREVIOUS GALLERY IMAGES
-                if (!is_null($dispensaryGalleryImgs)) {
-                    foreach ($dispensaryGalleryImgs as $image) {
-                        $exp = explode('/', $image->image);
-                        $expImage = $exp[count($exp) - 1];
-
-                        if (File::exists(public_path('images/dispensery/products/gallery/' . $expImage))) {
-                            File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
-                        }
-                    }
-                }
-
-            }
+//            if ($request->hasFile('galleryimages')) {
+//                $dispensaryGalleryImgs = DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->get();
+//                DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->delete();
+//
+//                foreach ($request->file('galleryimages') as $image) {
+//
+//                    $name = $image->getClientOriginalName();
+//                    $name = $UUID . '-' . $name;
+//                    $image->move(public_path('images/dispensery/products/gallery'), $name);
+//
+//                    $bpg = new DispenseryProductGallery;
+//
+//                    $bpg->dispensery_product_id = $product->id;
+//                    $bpg->image = asset("images/dispensery/products/gallery/" . $name);
+//                    $bpg->save();
+//
+//                }
+//
+//                // DELETE PREVIOUS GALLERY IMAGES
+//                if (!is_null($dispensaryGalleryImgs)) {
+//                    foreach ($dispensaryGalleryImgs as $image) {
+//                        $exp = explode('/', $image->image);
+//                        $expImage = $exp[count($exp) - 1];
+//
+//                        if (File::exists(public_path('images/dispensery/products/gallery/' . $expImage))) {
+//                            File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
+//                        }
+//                    }
+//                }
+//
+//            }
 
             return redirect()->back()->with('info', 'Product Updated.');
 

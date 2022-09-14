@@ -108,7 +108,12 @@
                         </div>
 
                         <div class="row">
-
+                            <input type="hidden" name="state_id"  value="{{$subPrice->id}}">
+                            <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub">
+                                <label for="deal_price">Deal Price</label>
+                                <input type="number" readonly name="deal_price" id="deal_price" class="form-control"
+                                       required value="{{ $subPrice->deal_price }}">
+                            </div>
                             <div class="form-group name-on-card col-xs-12 col-sm-6 mb-3">
                                 <label for="name-on-card">Name on Card</label>
                                 <input type="text" class="form-control" id="name-on-card" name="name_on_card"
