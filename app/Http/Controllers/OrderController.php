@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Business;
 use App\Mail\OrderStatus;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller {
@@ -45,6 +47,8 @@ class OrderController extends Controller {
             return redirect()->back();
         }
 
+
+
         $updated = Order::where('tracking_number', $order->tracking_number)->where('retailer_id', session('business_id'))->update(['status' => $validated['status']]);
 
         if($order->status != $validated['status']) {
@@ -55,6 +59,30 @@ class OrderController extends Controller {
         }
 
         if($updated) {
+            if($order->product_id != null){
+                $product = DB::table('dispensery_products')->where('id', $order->product_id)->first();
+                $name = $product->name;
+                $image = $product->image ?? null;
+                $product = 'dispancery product';
+            }else{
+                $deal = DB::table('deals')->where('id', $order->deal_id)->first();
+                $name = $deal->title;
+                $image = json_decode($deal->picture);
+                $product = 'dispancery deal';
+            }
+
+
+            $notification = DB::table('notifications')->insert([
+                    'title'=>$order->qty.' '.$name .' Dispancery',
+                    'description'=>'Your order of dispancery has been '.$validated['status'],
+                    'path'=>'/profile/order-history/'.$order->tracking_number,
+                    'image'=>$image[0],
+                    'customer_id'=>$order->customer_id,
+                    'type_id'=>$order->product_id,
+                    'noti_type'=>$product,
+                    'created_at'=>Carbon::now(),
+                    'updated_at'=>Carbon::now(),
+                ]);
             return back()->with('success', 'Order status is changed');
         } else {
             return back()->with('error', 'Sorry Something went wrong');
