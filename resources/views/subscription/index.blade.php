@@ -5,21 +5,25 @@
 @endphp
 
 @section('content')
-    <div class="panel panel-headline">
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-12">
-                    @php
-                        $text = DB::table('tests')->first();
-                    @endphp
-                    <h4>
-                        {!! $text->dis_subscription !!}
-                    </h4>
+    <div class="dash-analytics">
+        <div class="d-box-text text-center p-4 mb-5" style="border-radius: 20px;">
+            <h1 style="font-weight: 900; font-style: italic;" class="d-size">SUBSCRIPTION</h1>
+        </div>
+        <div class="panel panel-headline">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        @php
+                            $text = DB::table('tests')->first();
+                        @endphp
+                        <h4>
+                            {!! $text->dis_subscription !!}
+                        </h4>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="panel panel-headline">
+        <div class="panel panel-headline">
         <div class="panel-heading">
             <div class="row">
                 <div class="col-md-6">
@@ -46,7 +50,6 @@
                                         <div class="col-md-12">
                                             <a href="#" class="btn btn-dark btn-block">Activate Subscription</a>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -91,12 +94,32 @@
         @else
             <div class="panel-body">
                 <div class="row">
-                    @include('partials.success-error')
                     <div class="col-md-12">
+                        <div class="text-center py-5" style="font-style: italic; color: #f8971c;">
+                            <h1 class="m-0" style="font-weight: bold; font-size: 5rem;">ALMOST THERE.</h1>
+                            <h3 class="m-0" style="font-size: 3rem;">COMPLETE THE PAYMENT FORM BELOW TO LOCK IN YOUR SUBSCIPTION NOW.</h3>
+                            <h3 class="m-0" style="font-size: 3rem; font-weight: bold;">PRICE: ${{$subPrice->sub_price}}</h3>
+                            <div class="mt-5" style="font-size: 1rem; color: #CCC;">
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                                <i class="fa fa-circle mx-2"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row">
+                    @include('partials.success-error')
+                    <div class="col-md-12 d-payment">
                         <form action="{{ route('subscription.store') }}" method="POST" enctype="multipart/form-data"
                               id="create-deal-form">
                             @csrf
-
 
                             <div class="form-group" style="display: none">
                                 <label for="product">State</label>
@@ -107,56 +130,47 @@
                                         <option value="{{ $row->id }}" > {{ $row->name }}</option>
                                     @endforeach
                                 </select>
-
-
                             </div>
 
-                            <div class="row">
+                            <div class="row" style="display: none">
                                 @if($subPrice)
-                                <input type="hidden" name="state_id" value="{{$subPrice->id}}">
-                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub" >
-                                    <label for="deal_price">Subscription Price</label>
-                                    <input type="number" name="price"  id="price" class="form-control" required
-                                           value="{{$subPrice->sub_price}}" readonly>
-                                </div>
-
-
-
+                                    <input type="hidden" name="state_id" value="{{$subPrice->id}}">
+                                    <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub" >
+                                        <label for="deal_price">Subscription Price</label>
+                                        <input type="number" name="price"  id="price" class="form-control" required value="{{$subPrice->sub_price}}" readonly>
+                                    </div>
                             </div>
-
                             <div class="row">
-
-                                <div class="form-group name-on-card col-xs-12 col-sm-6 mb-3">
-                                    <label for="name-on-card">Name on Card</label>
-                                    <input type="text" class="form-control" id="name-on-card" name="name_on_card"
-                                           value="{{ old('name_on_card') }}" required>
-
+                                <div class="col-md-6">
+                                    <h2 class="mt-0" style="font-weight: 900; font-style: italic;">PAYMENT INFORMATION</h2>
+                                    <div class="form-group-lg name-on-card">
+                                        <label for="name-on-card">Name on Card</label>
+                                        <input type="text" class="form-control d-r-0" id="name-on-card" name="name_on_card" value="{{ old('name_on_card') }}" required>
+                                    </div>
                                 </div>
-
-                                <div class="form-group CVV col-xs-12 col-sm-6">
-                                    <label for="cvv">CVV</label>
-                                    <input type="number" class="form-control" id="cvv" name="cvv"
-                                           value="{{ old('cvv') }}"
-                                           required>
+                                <div class="col-md-6">
+                                    <div class="text-right m-2">
+                                        <img src="{{asset('images/payment-420finder-logo.png')}}">
+                                    </div>
                                 </div>
-
-
-                                <div class="form-group col-xs-12 mb-3 col-sm-6" id="card-number-field">
+                            </div>
+                            <div class="row">
+                                <div class="form-group-lg col-xs-12 mb-3 col-sm-6" id="card-number-field">
                                     <label for="cardNumber">Card Number</label>
-                                    <input type="number" class="form-control" id="cardNumber" name="card_number"
+                                    <input type="number" class="form-control d-r-0" id="cardNumber" name="card_number"
                                            value="{{ old('card_number') }}" required>
                                 </div>
 
-                                <div class="form-group col-xs-12 col-sm-6" id="expiration-date">
+                                <div class="form-group-lg col-xs-12 col-sm-3" id="expiration-date">
                                     <label>Expiration Date</label><br/>
-                                    <select class="form-control" id="expiration-month" name="expiration_month"
+                                    <select class="form-control d-r-0" id="expiration-month" name="expiration_month"
                                             style="float: left; width: 100px; margin-right: 10px;" required>
                                         @foreach($months as $k=>$v)
                                             <option
                                                 value="{{ $k }}" {{ old('expiration_month') == $k ? 'selected' : '' }}>{{ $v }}</option>
                                         @endforeach
                                     </select>
-                                    <select class="form-control" id="expiration-year" name="expiration_year"
+                                    <select class="form-control d-r-0" id="expiration-year" name="expiration_year"
                                             style="float: left; width: 100px;" required>
 
                                         @for($i = date('Y'); $i <= (date('Y') + 15); $i++)
@@ -165,11 +179,40 @@
                                     </select>
                                 </div>
 
+                                <div class="form-group-lg CVV col-xs-12 col-sm-3">
+                                    <label for="cvv">CVV</label>
+                                    <input type="number" class="form-control d-r-0" id="cvv" name="cvv"
+                                           value="{{ old('cvv') }}"
+                                           required>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="d-card">
+                                        <img src="{{asset('images/VectorSmartObject.png')}}">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group text-center">
+                                        <button class="d-btn btn" id="create-deal-btn">Active</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div>
+                                        <h3 class="m-0" style="font-weight: bold">authorize.net</h3>
+                                        <p class="m-0">A Visa Solution</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="text-center">
+                                        <p style="font-style: italic">By clicking <span style="font-weight: bold;">Checkout</span>, you're agreeing to 420 Finder's <span style="font-weight: bold; text-decoration: underline">User Agreement</span></p>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <button class="btn btn-dark btn-block" id="create-deal-btn">Subscribe</button>
-                            </div>
                             @else
                                 <div class="form-group col-xs-12 col-sm-12 mb-3" id="description">
                                     <h4 style="color: red;text-align: center;">Your State is Not Eligible</h4>
@@ -181,7 +224,7 @@
             </div>
         @endif
     </div>
-
+    </div>
 @endsection
 
 @section('scripts')

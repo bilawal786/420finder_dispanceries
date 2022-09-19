@@ -1,79 +1,80 @@
 @extends('layouts.admin')
 
 @section('content')
-
-    <div class="panel panel-headline">
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-md-12">
-                    @php
-                        $text = DB::table('tests')->first();
-                    @endphp
-                    <h4>
-                        {!! $text->dis_request_product !!}
-                    </h4>
-                </div>
-            </div>
+    <div class="dash-analytics">
+        <div class="d-box-text text-center p-4 mb-5" style="border-radius: 20px;">
+            <h1 style="font-weight: 900; font-style: italic;" class="d-size">REQUEST PRODUCTS</h1>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-
-            <div class="panel panel-headline">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h3 class="panel-title">Request Products</h3>
-                        </div>
+        <div class="panel panel-headline">
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        @php
+                            $text = DB::table('tests')->first();
+                        @endphp
+                        <h4>
+                            {!! $text->dis_request_product !!}
+                        </h4>
                     </div>
                 </div>
             </div>
-
         </div>
-    </div>
+        <div class="row">
+            <div class="col-md-12">
 
-    <div class="row">
-        <div class="col-md-6 col-md-offset-3">
-
-            <div class="panel panel-headline">
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-12">
-
-                            @include('partials.success-error')
-
-                            <form action="{{ route('submitproductrequest') }}" method="POST">
-                                @csrf
-                                <div class="form-group">
-                                    <label for="">Brand</label>
-                                    <select id="rp_brand_id" name="brand_id" class="form-control" required="">
-                                        <option value="">Select</option>
-                                        @if($brands->count() > 0)
-                                            @foreach($brands as $brand)
-                                                <option value="{{ $brand->id }}">{{ $brand->business_name }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Product</label>
-                                    <select id="rp_products" name="product_id[]" class="selectPlugin form-control"
-                                            multiple="multiple" required="">
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <button class="btn btn-primary btn-block">Submit Request</button>
-                                </div>
-                            </form>
+                <div class="panel panel-headline">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h3 class="panel-title">Request Products</h3>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             </div>
-
         </div>
-    </div>
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
 
-    <div class="row">
+                <div class="panel panel-headline">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                @include('partials.success-error')
+
+                                <form action="{{ route('submitproductrequest') }}" method="POST">
+                                    @csrf
+                                    <div class="form-group">
+                                        <label for="">Brand</label>
+                                        <select id="rp_brand_id" name="brand_id" class="form-control" required="">
+                                            <option value="">Select</option>
+                                            @if($brands->count() > 0)
+                                                @foreach($brands as $brand)
+                                                    <option value="{{ $brand->id }}">{{ $brand->business_name }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Product</label>
+                                        <select id="rp_products" name="product_id[]" class="selectPlugin form-control"
+                                                multiple="multiple" required="">
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <button class="btn btn-primary btn-block">Submit Request</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="row">
         <div class="col-md-12">
 
             <div class="panel panel-headline">
@@ -153,5 +154,5 @@
 
         </div>
     </div>
-
+    </div>
 @endsection

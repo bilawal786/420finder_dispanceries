@@ -166,7 +166,7 @@ class DealsController extends Controller
             'title' => 'required',
             'description' => 'required',
             'deal_price' => 'required|numeric|min:1',
-            'state_id' => 'required',
+            'price'=>'required|numeric|min:1',
             'name_on_card' => 'required|min:2',
             'cvv' => 'required|numeric|digits:3',
             'card_number' => 'required|numeric|digits:16',
@@ -180,7 +180,7 @@ class DealsController extends Controller
             }
         }
 
-        $price = $request->deal_price;
+        $price = $request->price;
         $ending_date = Carbon::now()->addDays(14)->format('Y-m-d');
 
 

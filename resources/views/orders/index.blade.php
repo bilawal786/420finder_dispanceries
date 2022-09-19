@@ -1,21 +1,25 @@
 @extends('layouts.admin')
 
     @section('content')
-        <div class="panel panel-headline">
-            <div class="panel-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        @php
-                            $text = DB::table('tests')->first();
-                        @endphp
-                        <h4>
-                            {!! $text->dis_orders !!}
-                        </h4>
+        <div class="dash-analytics">
+            <div class="d-box-text text-center p-4 mb-5" style="border-radius: 20px;">
+                <h1 style="font-weight: 900; font-style: italic;" class="d-size">ORDERS</h1>
+            </div>
+            <div class="panel panel-headline">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            @php
+                                $text = DB::table('tests')->first();
+                            @endphp
+                            <h4>
+                                {!! $text->dis_orders !!}
+                            </h4>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="panel panel-headline">
+            <div class="panel panel-headline">
             <div class="panel-heading">
                 <div class="row">
                     <div class="col-md-12">
@@ -316,7 +320,7 @@
 
             </div>
         </div>
-
+        </div>
     @endsection
 
 @section('styles')
