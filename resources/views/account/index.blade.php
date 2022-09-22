@@ -42,7 +42,11 @@
     {{--                            text-center--}}
                                 <div class="form-group">
                                     <label for="">Directions</label>
+                                   @if($location == "Select location")
                                     <input id="searchTextField" type="text" name="address" class="form-control" value="{{$location}}">
+                                    @else
+                                        <input id="searchTextField" type="text" readonly name="address" class="form-control" value="{{$location}}">
+                                    @endif
                                 </div>
     {{--                          <button onclick="getLocation()" class="btn btn-info">Click to add your directions</button>--}}
                             </div>
@@ -264,9 +268,11 @@
                               <h4><strong>Address Line 2</strong></h4>
                               <p class="text-black-50">{{ $business->address_line_2 }}</p>
                             </div>
+                              @if($business->address_line_2 == null)
                             <div class="col-md-6 text-right">
                               <a data-toggle="modal" data-target="#addressline2" class="cursor-pointer">Edit</a>
                             </div>
+                              @endif
                           </div>
                         </div>
                       </div>
@@ -290,9 +296,11 @@
                                 <?php $state = \Illuminate\Support\Facades\DB::table('states')->where('id','=',$business->state_province)->first(); ?>
                                 <p class="text-black-50">{{ $state->name ?? '' }}</p>
                             </div>
+                              @if($business->state_province == null)
                               <div class="col-md-6 text-right">
                                   <a data-toggle="modal" data-target="#stateupdate" class="cursor-pointer">Edit</a>
                               </div>
+                              @endif
                           </div>
                         </div>
                       </div>
