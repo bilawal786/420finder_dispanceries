@@ -5,7 +5,6 @@
         <nav>
 
             <ul class="nav">
-
                 <li>
                     <a href="{{ route('index') }}" class=""><i class="lnr lnr-home"></i> <span>Dashboard</span></a>
                 </li>
@@ -15,14 +14,22 @@
                     @else
                         <a href="https://brands.420finder.net/redirect-to-brands/{{session('business_id')}}" class=""><i class="fa fa-dashboard"></i> <span>Master Dashboard</span></a>
                     @endif
-
                 </li>
                 <li>
                     <a href="{{ route('subscription') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i> <span>Subscription</span></a>
                 </li>
-                <li>
-                    <a href="{{ route('state.areas') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i>  <span>Sales&Marketing Products</span></a>
-                </li>
+                @php
+                    $response = \App\Http\SubscriptionHelper::checkSubscription(session('business_id'));
+                @endphp
+                @if($response)
+                    <li>
+                        <a href="{{ route('state.areas') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i>  <span>Sales&Marketing Products</span></a>
+                    </li>
+                @else
+                    <li>
+                        <a href="{{ route('subscription') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i>  <span>Sales&Marketing Products</span> </a>
+                    </li>
+                @endif
 
                 <li>
                     <a href="{{ route('requestproducts') }}" class=""><i class="fa fa-check-circle" aria-hidden="true"></i> <span>Request Products</span></a>
@@ -31,10 +38,18 @@
                 <li>
                     <a href="{{ route('products') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i> <span>Products</span></a>
                 </li>
-
-                <li>
-                    <a href="{{ route('deals') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i> <span>Deals</span></a>
-                </li>
+                @if($response)
+                    <li>
+                        <a href="{{ route('deals') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i> <span>Deals</span></a>
+                    </li>
+                @else
+                    <li>
+                        <a href="{{ route('subscription') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i>  <span>Deals</span> </a>
+                    </li>
+                @endif
+                {{-- <li>
+                    <a href="{{ route('deal-product.index') }}" class=""><i class="fa fa-product-hunt" aria-hidden="true"></i> <span>Deals Product</span></a>
+                </li> --}}
 
                 <li>
                     <a href="{{ route('transaction.index') }}" class=""><i class="fa fa-sort" aria-hidden="true"></i> <span>Transactions</span></a>
@@ -44,8 +59,8 @@
                     <a href="{{ route('orders') }}" class=""><i class="fa fa-sort" aria-hidden="true"></i> <span style="position: relative">Orders
 
                         @if($unreadOrders > 0)
-                        <span
-                           style="
+                                <span
+                                    style="
                                 position: absolute;
                                 right: -15px;
                                 top: -14px;
@@ -57,10 +72,10 @@
                                 padding: 0rem 0.6rem;
                                 font-size: 1.3rem;
                            "
-                        >
+                                >
                         {{ $unreadOrders }}
                         </span>
-                        @endif
+                            @endif
 
                     </span></a>
                 </li>
@@ -69,18 +84,16 @@
                     <a href="{{ route('detail.index') }}" class=""><i class="fa fa-sort" aria-hidden="true"></i> <span>Details</span></a>
                 </li>
 
+                {{--                <li>--}}
+                {{--                    <a href="{{ route('otherlocations') }}" class=""><i class="fa fa-sort" aria-hidden="true"></i> <span>Other Store Locations</span></a>--}}
+                {{--                </li>--}}
 
-{{--                <li>--}}
-{{--                    <a href="{{ route('otherlocations') }}" class=""><i class="fa fa-sort" aria-hidden="true"></i> <span>Other Store Locations</span></a>--}}
-{{--                </li>--}}
                 <li>
                     <a href="{{ route('gallery.index') }}" class=""><i class="fa fa-image" aria-hidden="true"></i> <span>Gallery</span></a>
                 </li>
                 <li>
                     <a href="{{ route('accountsettings') }}" class=""><i class="fa fa-user" aria-hidden="true"></i> <span>Account Settings</span></a>
                 </li>
-
-
             </ul>
 
         </nav>
