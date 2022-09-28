@@ -45,6 +45,12 @@
 
 
     <style>
+        .sidebar .nav span {
+            font-weight: bold !important;
+        }
+        .sidebar .nav > li > a {
+            padding: 18px 25px;
+        }
         .dropzone {
             background-color: #ccc;
             border: 3px dashed #888;

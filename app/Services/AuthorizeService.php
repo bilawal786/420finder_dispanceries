@@ -20,11 +20,15 @@ function chargeCreditCard($validated, $amount = 5.00)
     /* Create a merchantAuthenticationType object with authentication details
        retrieved from the constants file */
     $merchantAuthentication = new AnetAPI\MerchantAuthenticationType();
-//    $merchantAuthentication->setName('5PNFH3e83xK'); // LOGIN ID
-//    $merchantAuthentication->setTransactionKey('4C2X48Z9e3mtjzfF'); // TRANSACTION KEY
-    $merchantAuthentication->setName('2aDh57zQm'); // LOGIN ID
-    $merchantAuthentication->setTransactionKey('3NR84b94vU25wj8Y'); // TR
-    // Set the transaction's refId
+    if (env('APP_ENV') == 'local'){
+        $merchantAuthentication->setName('5PNFH3e83xK'); // LOGIN ID
+        $merchantAuthentication->setTransactionKey('4C2X48Z9e3mtjzfF'); // TRANSACTION KEY
+    }else{
+        $merchantAuthentication->setName('2aDh57zQm'); // LOGIN ID
+        $merchantAuthentication->setTransactionKey('3NR84b94vU25wj8Y'); // TR
+    }
+
+        // Set the transaction's refId
     $refId = 'ref' . time();
 
     // Create the payment data for a credit card
@@ -101,8 +105,11 @@ function chargeCreditCard($validated, $amount = 5.00)
 
     // Create the controller and get the response
     $controller = new AnetController\CreateTransactionController($request);
-    $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
-
+    if (env('APP_ENV') == 'local'){
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::SANDBOX);
+    }else{
+        $response = $controller->executeWithApiResponse(\net\authorize\api\constants\ANetEnvironment::PRODUCTION);
+    }
 
     if ($response != null) {
         // Check to see if the API request was successfully received and acted upon
