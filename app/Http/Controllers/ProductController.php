@@ -121,9 +121,9 @@ class ProductController extends Controller
     {
 
 
-        if (is_null($this->checkIfPaid())) {
-            return $this->redirectToPayment();
-        }
+//        if (is_null($this->checkIfPaid())) {
+//            return $this->redirectToPayment();
+//        }
 
         if (is_null($this->checkIfRetailerProduct($id))) {
             return redirect()->route('products');
@@ -479,13 +479,10 @@ class ProductController extends Controller
 
     public function updateproduct(Request $request)
     {
-
 //        if (is_null($this->checkIfPaid())) {
 //            return $this->redirectToPayment();
 //        }
-
         $UUID = (string)Str::uuid();
-
         $validated = $request->validate([
             'product_id' => 'required',
             'name' => 'required',
@@ -493,107 +490,74 @@ class ProductController extends Controller
             'sku' => 'required',
             'status' => 'required'
         ]);
-
         if (is_null($this->checkIfRetailerProduct($request->product_id))) {
             return redirect()->back();
         }
-
         $product = DispenseryProduct::find($request->product_id);
-
         $product->name = $request->name;
-
         $product->slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $request->name)));
-
         $product->description = $request->description;
-
         $oldImage = NULL;
-
         if ($request->hasFile('image')) {
-
             $avatar = $request->file('image');
             $filename = time() . '.' . $avatar->GetClientOriginalExtension();
-
             $avatar_img = Image::make($avatar);
             $avatar_img->resize(274, 274)->save(public_path('images/brands/products/' . $filename));
-
             $oldImage = $product->image;
             $product->image = asset("images/brands/products/" . $filename);
-
         }
-
         $product->status = $request->status;
         $product->sku = $request->sku;
         $product->price = $request->price;
-        // $product->off = $request->off;
-
         $product->off = 0;
-
+        $product->fp1 = $request->fp1;
+        $product->fp2 = $request->fp2;
+        $product->fp3 = $request->fp3;
+        $product->fp4 = $request->fp4;
+        $product->fp5 = $request->fp5;
         if ($request->is_featured == 'on') {
-
             $product->is_featured = 1;
-
         } else {
-
             $product->is_featured = 0;
-
         }
-
         $product->strain_id = $request->strain_id;
         $product->genetic_id = $request->genetic_id;
         $product->thc_percentage = $request->thc_percentage;
         $product->cbd_percentage = $request->cbd_percentage;
-
         if ($product->save()) {
-
             if (!is_null($oldImage)) {
                 $exp = explode('/', $oldImage);
                 $expImage = $exp[count($exp) - 1];
-
                 if (File::exists(public_path('images/brands/products/' . $expImage))) {
                     File::delete(public_path('images/brands/products/' . $expImage));
                 }
             }
-
-//            if ($request->hasFile('galleryimages')) {
-//                $dispensaryGalleryImgs = DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->get();
-//                DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->delete();
-//
-//                foreach ($request->file('galleryimages') as $image) {
-//
-//                    $name = $image->getClientOriginalName();
-//                    $name = $UUID . '-' . $name;
-//                    $image->move(public_path('images/dispensery/products/gallery'), $name);
-//
-//                    $bpg = new DispenseryProductGallery;
-//
-//                    $bpg->dispensery_product_id = $product->id;
-//                    $bpg->image = asset("images/dispensery/products/gallery/" . $name);
-//                    $bpg->save();
-//
-//                }
-//
-//                // DELETE PREVIOUS GALLERY IMAGES
-//                if (!is_null($dispensaryGalleryImgs)) {
-//                    foreach ($dispensaryGalleryImgs as $image) {
-//                        $exp = explode('/', $image->image);
-//                        $expImage = $exp[count($exp) - 1];
-//
-//                        if (File::exists(public_path('images/dispensery/products/gallery/' . $expImage))) {
-//                            File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
-//                        }
-//                    }
-//                }
-//
-//            }
-
+            if ($request->hasFile('galleryimages')) {
+                $dispensaryGalleryImgs = DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->get();
+                DispenseryProductGallery::where('dispensery_product_id', $request->product_id)->delete();
+                foreach ($request->file('galleryimages') as $image) {
+                    $name = $image->getClientOriginalName();
+                    $name = $UUID . '-' . $name;
+                    $image->move(public_path('images/dispensery/products/gallery'), $name);
+                    $bpg = new DispenseryProductGallery;
+                    $bpg->dispensery_product_id = $product->id;
+                    $bpg->image = asset("images/dispensery/products/gallery/" . $name);
+                    $bpg->save();
+                }
+                if (!is_null($dispensaryGalleryImgs)) {
+                    foreach ($dispensaryGalleryImgs as $image) {
+                        $exp = explode('/', $image->image);
+                        $expImage = $exp[count($exp) - 1];
+                        if (File::exists(public_path('images/dispensery/products/gallery/' . $expImage))) {
+                            File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
+                        }
+                    }
+                }
+            }
             return redirect()->back()->with('info', 'Product Updated.');
-
         } else {
-
             return redirect()->back()->with('error', 'Problem occured while updated product.');
-
         }
-
     }
 
 

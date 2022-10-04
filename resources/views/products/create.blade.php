@@ -29,7 +29,7 @@
                                     <label for="" class="pb-2">Avatar image</label>
                                     <img src="{{ asset('dummy.png') }}" alt="" class="w-100 img-thumbnail">
                                     <div class="form-group mt-3">
-                                        <input type="file" name="image" class="form-control" required="">
+                                        <input type="file" name="image" class="form-control" required="" accept="image/png, image/jpg, image/jpeg">
                                     </div>
                                 </div>
                                 <div class="col-md-10">
@@ -111,7 +111,7 @@
                                     </div>
                                     <div class="form-group pt-3" id="suggestPrice">
                                         <label for="">Suggested Price*</label>
-                                        <input type="number" name="suggested_price" class="form-control" >
+                                        <input type="number" name="suggested_price" id="suggested_price" class="form-control" >
                                     </div>
                                     <div class="form-group pt-4">
                                         <div class="row">
@@ -217,9 +217,11 @@
             if (category_id == "4"){
                 $("#flowerId").show();
                 $("#suggestPrice").hide();
+                $("#suggested_price").val("");
             }else {
                 $("#flowerId").hide();
                 $("#suggestPrice").show();
+                $("#suggested_price").val("");
             }
             {{--$("#typesubcategories").addClass('loader');--}}
             {{--$.ajax({--}}
