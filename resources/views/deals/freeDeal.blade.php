@@ -5,7 +5,9 @@
 @endphp
 
 @section('content')
-
+    <div class="d-box-text text-center p-4 mb-5" style="border-radius: 20px;">
+        <h1 style="font-weight: 900; font-style: italic;" class="d-size">CREATE DEAL</h1>
+    </div>
     <div class="panel panel-headline">
         <div class="panel-heading">
             <div class="row">
@@ -29,7 +31,8 @@
 
                             <div class="form-group">
                                 <label for="">Deal Title (choose something catchy!)</label>
-                                <input type="text" name="title" placeholder="Enter Title" class="form-control" required=""
+                                <input type="text" name="title" placeholder="Enter Title" class="form-control"
+                                       required=""
                                        value="{{ old('title') }}">
                             </div>
 
@@ -41,7 +44,8 @@
 
                             <div class="form-group">
                                 <label for="product">Products Included in deal (Optional. Choose up to 2)</label>
-                                <select name="product_id" id="product" class="form-control" style="margin-bottom: 1.2rem;">
+                                <select name="product_id" id="product" class="form-control"
+                                        style="margin-bottom: 1.2rem;">
                                     <option value="">Select Product</option>
                                     @foreach ($products as $product)
                                         <option value="{{ $product->id }}">{{ $product->name }}</option>
@@ -68,34 +72,31 @@
                                     </select>
                                 </div>
 
-{{--                                <input type="hidden" name="state_id"  value="{{$subPrice->id}}">--}}
-{{--                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub">--}}
-{{--                                    <label for="deal_price">Deal Price</label>--}}
-{{--                                    <input type="number" readonly name="deal_price" id="deal_price" class="form-control"--}}
-{{--                                           required value="{{ $subPrice->deal_price }}">--}}
-{{--                                </div>--}}
+                                {{--                                <input type="hidden" name="state_id"  value="{{$subPrice->id}}">--}}
+                                {{--                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub">--}}
+                                {{--                                    <label for="deal_price">Deal Price</label>--}}
+                                {{--                                    <input type="number" readonly name="deal_price" id="deal_price" class="form-control"--}}
+                                {{--                                           required value="{{ $subPrice->deal_price }}">--}}
+                                {{--                                </div>--}}
 
-                                <input type="hidden" name="state_id"  value="{{$subPrice->id}}">
+                                <input type="hidden" name="state_id" value="{{$subPrice->id}}">
                                 <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub">
                                     <label for="deal_price">Deal Price</label>
                                     <input type="number" name="deal_price" id="deal_price" class="form-control"
                                            required>
                                 </div>
-                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub">
+                                <div class="form-group col-xs-12 col-sm-6 mb-3" id="sub" style="display: none">
                                     <label for="deal_price">Deal Fee</label>
-                                    <input type="number" readonly  name="price" id="deal_price" class="form-control"
+                                    <input type="number" readonly name="price" id="deal_price" class="form-control"
                                            required value="{{ $subPrice->deal_price }}">
                                 </div>
 
                             </div>
-
-
                             <div class="form-group">
                                 <label for="">Description of Deal</label>
                                 <textarea name="description" cols="5" rows="5" placeholder="Enter Details about deal"
                                           class="form-control" required="">{{ old('description') }}</textarea>
                             </div>
-
                             <div class="form-group" style="display: none">
                                 <label for="tier">Choose how long your Deal will be listed</label>
                                 <select name="tier_id" id="tier" class="form-control">
@@ -105,7 +106,6 @@
                                     <option value="3">4 weeks: $140</option>
                                 </select>
                             </div>
-
                             <div id="onlinedeal" style="display: none;">
                                 <div class="form-group">
                                     <label for="">Coupon Code</label>
@@ -118,9 +118,10 @@
                                            class="form-control">
                                 </div>
                             </div>
-
                             <div class="form-group">
-                                <button class="btn btn-dark btn-block" id="create-deal-btn">Create Deal</button>
+                                <button style="padding: 15px; font-size: 30px; font-weight: bold"
+                                        class="btn btn-dark btn-block" id="create-deal-btn">CREATE FREE DEAL
+                                </button>
                             </div>
                         </form>
                     @else
