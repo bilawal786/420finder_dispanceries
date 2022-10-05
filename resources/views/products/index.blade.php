@@ -67,7 +67,8 @@
                                                 </td>
                                                 <td>
                                                     @if ($product->brand_product)
-                                                        <label class="badge" style="background: #4b4bd5;">Verified</label>
+                                                        <label class="badge"
+                                                               style="background: #4b4bd5;">Verified</label>
 
                                                     @else
                                                         Not verified
@@ -80,7 +81,11 @@
                                                     ?>
                                                     {{ $category }}
                                                 </td>
-                                                <td>${{ $product->price }}</td>
+                                                @if($product->category_id == 4)
+                                                    <td>Flower Product</td>
+                                                @else
+                                                    <td>${{ $product->price }}</td>
+                                                @endif
                                                 <td>
                                                     @if($product->status == 0)
                                                         No
@@ -94,8 +99,10 @@
                                                         <button disabled class="text-center"
                                                                 style="background: #fff; border: 1px solid #fff;">
                                                             <svg xmlns="http://www.w3.org/2000/svg"
-                                                                 xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
-                                                                 id="Capa_1" x="0px" y="0px" viewBox="0 0 167.751 167.751"
+                                                                 xmlns:xlink="http://www.w3.org/1999/xlink"
+                                                                 version="1.1"
+                                                                 id="Capa_1" x="0px" y="0px"
+                                                                 viewBox="0 0 167.751 167.751"
                                                                  style="enable-background:new 0 0 167.751 167.751;fill: #d72424;"
                                                                  xml:space="preserve" height="25" width="25">
                                                         <path
@@ -162,7 +169,8 @@
                     </div>
 
                     <!-- Modal -->
-                    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel"
+                    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog"
+                         aria-labelledby="deleteModalLabel"
                          aria-hidden="true">
                         <div class="modal-dialog" role="document">
 
@@ -222,7 +230,8 @@
 
                                         <div class="form-group name-on-card col-xs-12 mb-3">
                                             <label for="name-on-card">Name on Card</label>
-                                            <input type="text" class="form-control" id="name-on-card" name="name_on_card"
+                                            <input type="text" class="form-control" id="name-on-card"
+                                                   name="name_on_card"
                                                    value="{{ old('name_on_card') }}" required>
 
                                         </div>
@@ -261,7 +270,8 @@
                                     </div>
 
                                     <div style="margin-top: 1rem">
-                                        <button class="btn btn-primary" id="retailer-products-payment-submit">Pay</button>
+                                        <button class="btn btn-primary" id="retailer-products-payment-submit">Pay
+                                        </button>
                                     </div>
 
                                 </form>
