@@ -1,8 +1,9 @@
 @extends('layouts.admin')
 @section('content')
     <style>
-        .text-1{
-            text-align: right; font-size: 25px;
+        .text-1 {
+            text-align: right;
+            font-size: 25px;
             font-weight: bold;
         }
     </style>
@@ -18,9 +19,7 @@
             <div class="row">
                 <div class="card">
                     <div class="card-body pb-5">
-
                         @include('partials.success-error')
-
                         <form action="{{ route('product.store') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             {{-- <input type="hidden" name="brand_id" value="{{ $brand->id }}"> --}}
@@ -29,7 +28,8 @@
                                     <label for="" class="pb-2">Avatar image</label>
                                     <img src="{{ asset('dummy.png') }}" alt="" class="w-100 img-thumbnail">
                                     <div class="form-group mt-3">
-                                        <input type="file" name="image" class="form-control" required="" accept="image/png, image/jpg, image/jpeg">
+                                        <input type="file" name="image" class="form-control" required=""
+                                               accept="image/png, image/jpg, image/jpeg">
                                     </div>
                                 </div>
                                 <div class="col-md-10">
@@ -68,50 +68,23 @@
                                         </div>
                                         <div class="col-md-9" style="display: none" id="flowerId">
                                             <div class="row">
-                                                <div class="col-md-6">
-                                                   <p class="text-1">1 gram :</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <input type="number" name="fp1" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <p class="text-1">3.5 or 1/8oz :</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <input type="number" name="fp2" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <p class="text-1">7g or 1/4oz :</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <input type="number" name="fp3" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <p class="text-1">14 g or 1/2oz :</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <input type="number" name="fp4" class="form-control">
-                                                </div>
-                                            </div>
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <p class="text-1">28g or  1oz :</p>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <input type="number" name="fp5" class="form-control">
+                                                <div class="col-md-12">
+                                                    <label for="">Select Gram</label>
+                                                    <select name="fp1" id="" class="form-control">
+                                                        <option value="1 gram">1 gram</option>
+                                                        <option value="3.5 or 1/8oz">3.5 or 1/8oz</option>
+                                                        <option value="7g or 1/4oz">7g or 1/4oz</option>
+                                                        <option value="14 g or 1/2oz">14 g or 1/2oz</option>
+                                                        <option value="28g or 1oz">28g or 1oz</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group pt-3" id="suggestPrice">
                                         <label for="">Suggested Price*</label>
-                                        <input type="number" name="suggested_price" id="suggested_price" class="form-control" >
+                                        <input type="number" name="suggested_price" id="suggested_price"
+                                               class="form-control">
                                     </div>
                                     <div class="form-group pt-4">
                                         <div class="row">
@@ -205,22 +178,18 @@
             </div>
         </div>
     </div>
-
 @endsection
-
 @section('scripts')
     <script>
         $(".mainCategory").click(function () {
             var category_id = $(this).val();
             var maincat = $(this).attr('rel');
             console.log(category_id);
-            if (category_id == "4"){
+            if (category_id == "4") {
                 $("#flowerId").show();
-                $("#suggestPrice").hide();
                 $("#suggested_price").val("");
-            }else {
+            } else {
                 $("#flowerId").hide();
-                $("#suggestPrice").show();
                 $("#suggested_price").val("");
             }
             {{--$("#typesubcategories").addClass('loader');--}}
@@ -248,4 +217,3 @@
         });
     </script>
 @endsection
-
