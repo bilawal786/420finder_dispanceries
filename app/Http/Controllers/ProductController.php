@@ -533,4 +533,15 @@ class ProductController extends Controller
             ->with('genetics', $genetics)
             ->with('strains', $strains);
     }
+    public function filters($id){
+        if ($id == 0){
+            $products = DispenseryProduct::where('dispensery_id', session('business_id'))->latest()->get();
+        }else{
+            $products = DispenseryProduct::where('dispensery_id', session('business_id'))->where('category_id', $id)->latest()->get();
+        }
+        $paid = RetailerMenuOrder::where('retailer_id', session('business_id'))->first();
+        return view('products.index')
+            ->with('products', $products)
+            ->with('paid', $paid);
+    }
 }

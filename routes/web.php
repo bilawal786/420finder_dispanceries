@@ -60,6 +60,7 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['checkIfAu
     // AJAX CALL
     Route::post('/gettypesubcat', 'ProductController@gettypesubcat')->name('gettypesubcat');
     Route::resource('gallery', 'GalleryController');
+    Route::post('update-timezone', 'AccountController@timezone')->name('update-timezone');
     Route::get('/account-settings', [
         'uses' => 'AccountController@index',
         'as' => 'accountsettings'
@@ -108,6 +109,7 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['checkIfAu
         'uses' => 'ProductController@productrequests',
         'as' => 'requestproducts'
     ]);
+    Route::get('product/filter/{id}', 'ProductController@filters')->name('product.filter');
     // Ajax Call
     Route::post('/getrproducts', [
         'uses' => 'ProductController@getrproducts',
