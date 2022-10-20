@@ -319,8 +319,13 @@
                                     <form action="{{route('update-timezone')}}" method="POST">
                                         @csrf
                                         <h4><strong>Time Zone</strong></h4>
-                                        <select required class="form-control" name="timezone" id="timezone">
+                                        <select required class="form-control" name="timezone">
                                             <option value=""> Select Timezone</option>
+                                            <option {{$business->timezone == "America/New_York" ? "selected" : ""}} value="America/New_York">America / New York - Eastern</option>
+                                            <option {{$business->timezone == "America/Chicago" ? "selected" : ""}} value="America/Chicago">America / Chicago - Central</option>
+                                            <option {{$business->timezone == "America/Denver" ? "selected" : ""}} value="America/Denver">America / Denver - Mountain</option>
+                                            <option {{$business->timezone == "America/Phoenix" ? "selected" : ""}} value="America/Phoenix">America / Phoenix - Arizona (state)</option>
+                                            <option {{$business->timezone == "America/Anchorage" ? "selected" : ""}} value="America/Anchorage">America / Anchorage - Alaska (state)</option>
                                         </select>
                                         <br>
                                         <button type="submit" class="btn btn-primary">Update</button>
@@ -1170,15 +1175,4 @@
     </div>
      -->
 
-@endsection
-@section('scripts')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.19.0/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.13/moment-timezone-with-data.js"></script>
-    <script>
-        var timezone = moment.tz.names();
-        for (const timezon of timezone) {
-            $('#timezone').append("<option value='"+timezon+"'>" + timezon + "</option>");
-            console.log(timezon)
-        }
-    </script>
 @endsection
