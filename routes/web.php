@@ -155,6 +155,8 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['checkIfAu
         'uses' => 'AccountController@updateprofilepicture',
         'as' => 'updateprofilepicture'
     ]);
+    Route::get('/seo', 'AccountController@seo')->name('seo');
+    Route::post('/update/seo', 'AccountController@seoUpdate')->name('update.seo');
     Route::post('/account-settings/profile/update/order-method', [
         'uses' => 'AccountController@updateordermethod',
         'as' => 'updateordermethod'
