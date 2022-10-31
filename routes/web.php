@@ -61,6 +61,7 @@ Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['checkIfAu
     Route::post('/gettypesubcat', 'ProductController@gettypesubcat')->name('gettypesubcat');
     Route::resource('gallery', 'GalleryController');
     Route::post('update-timezone', 'AccountController@timezone')->name('update-timezone');
+    Route::post('add/strain', 'AccountController@addStrain')->name('add.strain');
     Route::get('/account-settings', [
         'uses' => 'AccountController@index',
         'as' => 'accountsettings'
