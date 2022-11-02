@@ -277,9 +277,9 @@ class ProductController extends Controller
     */
     public function destroy($dispensaryProduct)
     {
-        if (is_null($this->checkIfPaid())) {
-            return $this->redirectToPayment();
-        }
+//        if (is_null($this->checkIfPaid())) {
+//            return $this->redirectToPayment();
+//        }
         // $dispensaryProduct = DispenseryProduct::find($dispensaryProduct)->delete();
         if (is_null($this->checkIfRetailerProduct($dispensaryProduct))) {
             return redirect()->back();
