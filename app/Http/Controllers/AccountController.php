@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\TrackHistory;
 use App\Models\Business;
 use App\Models\StoreLocation;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class AccountController extends Controller
         } else {
             $location = $data->results[3]->formatted_address;
         }
+        TrackHistory::track_history('Account',"Address Update");
         return view('account.index')
             ->with('business', $business)
             ->with('location', $location)
@@ -40,6 +42,7 @@ class AccountController extends Controller
             $avatar_img->resize(250, 250)->save(public_path('images/dispensery/profile/' . $filename));
             $business->profile_picture = asset("images/dispensery/profile/" . $filename);
             $business->save();
+            TrackHistory::track_history('Account',"Profile Picture Update");
             return redirect()->back()->with('info', 'Profile Picture Updated.');
         }
     }
@@ -49,6 +52,7 @@ class AccountController extends Controller
         $firstname = Business::find(session('business_id'));
         $firstname->first_name = $request->first_name;
         $firstname->save();
+        TrackHistory::track_history('Account',"Firstname Update");
         return redirect()->back()->with('info', 'First Name Updated.');
     }
 
@@ -57,6 +61,7 @@ class AccountController extends Controller
         $lastname = Business::find(session('business_id'));
         $lastname->last_name = $request->last_name;
         $lastname->save();
+        TrackHistory::track_history('Account',"Lastname Update");
         return redirect()->back()->with('info', 'Last Name Updated.');
     }
 
@@ -72,6 +77,7 @@ class AccountController extends Controller
         $email = Business::find(session('business_id'));
         $email->email = $request->email;
         $saved = $email->save();
+        TrackHistory::track_history('Account',"Email Update");
         if ($saved) {
             return redirect()->back()->with('info', 'Email Updated.');
         } else {
@@ -84,6 +90,7 @@ class AccountController extends Controller
         $phone_number = Business::find(session('business_id'));
         $phone_number->phone_number = $request->phone_number;
         $phone_number->save();
+        TrackHistory::track_history('Account',"Phone Update");
         return redirect()->back()->with('info', 'Phone Number Updated.');
     }
 
@@ -92,6 +99,7 @@ class AccountController extends Controller
         $business_name = Business::find(session('business_id'));
         $business_name->business_name = $request->business_name;
         $business_name->save();
+        TrackHistory::track_history('Account',"Business Name Update");
         return redirect()->back()->with('info', 'Business Name Updated.');
     }
 
@@ -103,6 +111,7 @@ class AccountController extends Controller
         $phone = Business::find(session('business_id'));
         $phone->business_phone_number = $request->business_phone_number;
         $saved = $phone->save();
+        TrackHistory::track_history('Account',"Business Phone Update");
         if ($saved) {
             return redirect()->back()->with('info', 'Business Phone Updated.');
         } else {
@@ -115,6 +124,7 @@ class AccountController extends Controller
         $address_line_1 = Business::find(session('business_id'));
         $address_line_1->address_line_1 = $request->address_line_1;
         $address_line_1->save();
+        TrackHistory::track_history('Account',"Address One Update");
         return redirect()->back()->with('info', 'Address One Updated.');
     }
 
@@ -123,6 +133,7 @@ class AccountController extends Controller
         $address_line_2 = Business::find(session('business_id'));
         $address_line_2->address_line_2 = $request->address_line_2;
         $address_line_2->save();
+        TrackHistory::track_history('Account',"Address Two Update");
         return redirect()->back()->with('info', 'Address Two Updated.');
     }
 
@@ -131,6 +142,7 @@ class AccountController extends Controller
         $website = Business::find(session('business_id'));
         $website->website = $request->website;
         $website->save();
+        TrackHistory::track_history('Account',"Website Url Update");
         return redirect()->back()->with('info', 'Website URL Updated.');
     }
 
@@ -139,6 +151,7 @@ class AccountController extends Controller
         $instagram = Business::find(session('business_id'));
         $instagram->instagram = $request->instagram;
         $instagram->save();
+        TrackHistory::track_history('Account',"Instagram Url");
         return redirect()->back()->with('info', 'Instagram URL Updated.');
     }
 
@@ -160,6 +173,7 @@ class AccountController extends Controller
             $updateorderonline->order_online = 1;
             $updateorderonline->save();
         }
+        TrackHistory::track_history('Account',"Order Method Update");
         return redirect()->back()->with('info', 'Order Method Updated.');
     }
 
@@ -174,6 +188,7 @@ class AccountController extends Controller
         $business->saturday_open = $request->saturday_open;
         $business->sunday_open = $request->sunday_open;
         $business->update();
+        TrackHistory::track_history('Account',"Oppning Time Update");
         return redirect()->back()->with('info', 'Opening Time Updated.');
     }
 
@@ -188,6 +203,7 @@ class AccountController extends Controller
         $business->saturday_close = $request->saturday_close;
         $business->sunday_close = $request->sunday_close;
         $business->update();
+        TrackHistory::track_history('Account',"Closing Time Update");
         return redirect()->back()->with('info', 'Closing Time Updated.');
     }
 
@@ -197,6 +213,7 @@ class AccountController extends Controller
         $business->latitude = $request->latitude;
         $business->longitude = $request->longitude;
         $business->save();
+        TrackHistory::track_history('Account',"Save Coordinates");
         $response = ['statuscode' => 200, 'message' => 'Business Direction Updated.'];
         echo json_encode($response);
     }
@@ -217,6 +234,7 @@ class AccountController extends Controller
         $location->latitude = $request->latitude;
         $location->longitude = $request->longitude;
         $location->save();
+        TrackHistory::track_history('Account',"Save Location");
         return redirect()->back()->with('info', 'Store with location added.');
     }
 
@@ -224,6 +242,7 @@ class AccountController extends Controller
     {
         $location = StoreLocation::find($id);
         $location->delete();
+        TrackHistory::track_history('Account',"Delete Location");
         return redirect()->back()->with('info', 'Store Location Removed.');
     }
 
@@ -232,6 +251,7 @@ class AccountController extends Controller
         $business = Business::find(session('business_id'));
         $business->state_province = $request->state_province;
         $business->update();
+        TrackHistory::track_history('Account',"Update state");
         return redirect()->back()->with('info', 'State Update.');
     }
 
@@ -240,6 +260,7 @@ class AccountController extends Controller
         $business = Business::find(session('business_id'));
         $business->timezone = $request->timezone;
         $business->update();
+        TrackHistory::track_history('Account',"Timezone Update");
         return redirect()->back()->with('info', 'Time Zone Update Successfully!');
     }
 

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
+use App\Http\TrackHistory;
 
 class GalleryController extends Controller
 {
@@ -19,6 +20,7 @@ class GalleryController extends Controller
     public function index()
     {
         $data = DB::table('business_galleries')->where('business_id', Session::get("business_id"))->get();
+        TrackHistory::track_history('Gallery',"View Gallery");
         return view('gallery.index', compact('data'));
     }
 
@@ -55,6 +57,7 @@ class GalleryController extends Controller
             'created_at' => Carbon::now(),
             'updated_at' => Carbon::now()
         ]);
+        TrackHistory::track_history('Gallery',"Store Gallery");
         return response()->json($header_img);
     }
 
@@ -67,6 +70,7 @@ class GalleryController extends Controller
     public function show($id)
     {
         $data = DB::table('business_galleries')->find($id);
+        TrackHistory::track_history('Gallery',"View Gallery");
         return view('gallery.show', compact('data'));
     }
 
@@ -107,6 +111,7 @@ class GalleryController extends Controller
         $path = substr($image->image, $length + 1);
         File::delete($path);
         DB::table('business_galleries')->delete($id);
+        TrackHistory::track_history('Gallery',"Delete Gallery");
         return redirect()->route('gallery.index');
     }
 }

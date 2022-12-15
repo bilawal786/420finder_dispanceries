@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\TrackHistory;
 use App\Models\Business;
 use App\Models\Deal;
 use App\Models\DealOrder;
@@ -24,6 +25,7 @@ class DealsController extends Controller
     {
         $deals = Deal::where('retailer_id', session('business_id'))->latest()->get();
         $deal_wallet = Business::where('id', session('business_id'))->select('deal_wallet')->first();
+        TrackHistory::track_history('Deal',"View Deals");
         return view('deals.index')
             ->with('deals', $deals)
             ->with('deal_wallet', $deal_wallet);
@@ -39,6 +41,7 @@ class DealsController extends Controller
         $dealProduct1 = $dealProducts->has(0) ? $dealProducts[0] : null;
         $dealProduct2 = $dealProducts->has(1) ? $dealProducts[1] : null;
         $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+        TrackHistory::track_history('Deal',"Edit Deals");
         return view('deals.edit')
             ->with('deal', $deal)
             ->with('dealProduct1', $dealProduct1)
@@ -262,6 +265,7 @@ class DealsController extends Controller
         $state = DB::table('states')->get();
         $business = Business::where('id', '=', session('business_id'))->first();
         $subPrice = DB::table('states')->where('id', '=', $business->state_province)->first();
+        TrackHistory::track_history('Deal',"Create Deals");
         return view('deals.create', [
             'products' => $products,
             'state' => $state,
@@ -331,6 +335,7 @@ class DealsController extends Controller
                 'product_id' => $request->product_id_2
             ]);
         }
+        TrackHistory::track_history('Deal',"Update Deals");
         return redirect()->back()->with('info', 'Deal updated.');
     }
 
@@ -359,6 +364,7 @@ class DealsController extends Controller
         $deal = Deal::find($id);
         $oldPictures = $deal->picture;
         $deleted = $deal->delete();
+        TrackHistory::track_history('Deal',"Delete Deals");
         if ($deleted) {
             if ($oldPictures) {
                 $oldPictures = json_decode($oldPictures);
@@ -381,6 +387,7 @@ class DealsController extends Controller
         $state = DB::table('states')->get();
         $business = Business::where('id', '=', session('business_id'))->first();
         $subPrice = DB::table('states')->where('id', '=', $business->state_province)->first();
+        TrackHistory::track_history('Subscription',"View Subscription");
         if (!$subPrice) {
             return redirect()->back()->with('error', 'Your Profile is not complete, Complete your profile first!');
         }
@@ -433,6 +440,7 @@ class DealsController extends Controller
             DB::table('businesses')->where('id', session('business_id'))->update([
                 'deal_wallet' => $getbusiness->deal_wallet + 1
             ]);
+            TrackHistory::track_history('Subscription',"Purchase Subscription");
             return redirect()->back()->with('info', 'Deal created.');
         } else {
             return redirect()->back()->with('error', 'Sorry we couldn\'t process the payment');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\DB;
+use App\Http\TrackHistory;
 
 class TransactionController extends Controller
 {
@@ -15,6 +16,7 @@ class TransactionController extends Controller
         $markieting = DB::table('banner_paymants')->where('retailer_id', session('business_id'))
             ->join('position_sets', 'position_sets.b_payment_id', '=', 'banner_paymants.id')
             ->get();
+        TrackHistory::track_history('Transaction',"View Transactions");
         return view('transaction.index')->with([
             'transaction' => $transaction,
             'dealTransaction' => $dealTransaction,

@@ -1,6 +1,8 @@
 <?php
 use App\Http\Controllers\ApproveController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Helper\History;
+use App\Http\TrackHistory;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,9 +23,13 @@ Route::group(['namespace' => 'App\Http\Controllers'], function () {
         'as' => 'checkLogin'
     ]);
 });
-// Route::get('/', function () {
-//     return view('welcome');
-// });
+ Route::get('/testrequest', function () {
+$ip = request()->ip;
+$data = \Location::get($ip);
+echo $data->cityName;
+
+ });
+
 Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['checkIfAuthenticated']], function () {
     Route::get('/logoutadmin', [
         'uses' => 'AdminController@logoutadmin',
@@ -36,6 +42,7 @@ Route::get('/redirect-to-dispansary/{id}', function ($id) {
     \Illuminate\Support\Facades\Session::put('business_name', $business->name);
     \Illuminate\Support\Facades\Session::put('business_type', $business->type);
     \Illuminate\Support\Facades\Session::put('business_email', $business->email);
+    TrackHistory::track_history('Login',"User Logged in");
     return redirect()->route('index');
 });
 Route::group(['namespace' => 'App\Http\Controllers', 'middleware' => ['checkIfAuthenticated', 'checkIfApproved']], function () {

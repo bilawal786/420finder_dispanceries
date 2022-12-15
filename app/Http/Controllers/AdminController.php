@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\TrackHistory;
 use App\Models\Business;
 use App\Models\Deal;
 use App\Models\DispenseryProduct;
@@ -114,6 +115,7 @@ class AdminController extends Controller
                     if (Session::has("prevUrl")) {
                         return redirect()->to(Session::get('prevUrl'));
                     } else {
+                        TrackHistory::track_history('Login',"User Logged in");
                         return redirect()->route('index');
                     }
                 } elseif ($business[0]['status'] == 2) {
@@ -129,6 +131,7 @@ class AdminController extends Controller
 
     public function logoutadmin()
     {
+        TrackHistory::track_history('Logout','User Logged out');
         session()->forget('business_id');
         session()->forget('business_name');
         return redirect()->route('login');

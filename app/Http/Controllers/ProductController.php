@@ -26,6 +26,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use App\Http\TrackHistory;
 
 class ProductController extends Controller
 {
@@ -33,6 +34,7 @@ class ProductController extends Controller
     {
         $products = DispenseryProduct::where('dispensery_id', session('business_id'))->latest()->get();
         $paid = RetailerMenuOrder::where('retailer_id', session('business_id'))->first();
+        TrackHistory::track_history('Product',"View Products");
         return view('products.index')
             ->with('products', $products)
             ->with('paid', $paid);
@@ -45,6 +47,7 @@ class ProductController extends Controller
 //        }
         $brands = Business::where('business_type', 'Brand')->where('approve', 1)->select('id', 'business_name')->get();
         $requests = ProductRequest::where('retailer_id', session('business_id'))->get();
+        TrackHistory::track_history('Product',"Request Products");
         return view('requestproducts.index')
             ->with('brands', $brands)
             ->with('requests', $requests);
@@ -80,6 +83,7 @@ class ProductController extends Controller
         $req->brand_id = $request->brand_id;
         $req->products = $productIds;
         $req->save();
+        TrackHistory::track_history('Product',"Submit products request");
         return redirect()->back()->with('info', 'Request Submitted.');
     }
 
@@ -98,6 +102,7 @@ class ProductController extends Controller
         $gallery = DispenseryProductGallery::where('dispensery_product_id', $id)->get();
         $strains = Strain::all();
         $genetics = Genetic::all();
+        TrackHistory::track_history('Product',"Edit product");
         return view('products.edit')
             ->with('product', $product)
             ->with('gallery', $gallery)
@@ -116,6 +121,7 @@ class ProductController extends Controller
             ['id', $productId],
             ['dispensery_id', $businessId]
         ])->first();
+        TrackHistory::track_history('View',"View prodcut");
         return $product;
     }
 
@@ -265,6 +271,7 @@ class ProductController extends Controller
             $product->is_featured = 0;
         }
         if ($product->save()) {
+            TrackHistory::track_history('Prodcut',"Create prodcut");
             return redirect()->route('products')->with('info', 'Product Created.');
         } else {
             return redirect()->route('products')->with('error', 'Problem occured while creating product.');
@@ -323,6 +330,7 @@ class ProductController extends Controller
                     File::delete(public_path('images/brands/products/' . $expImage));
                 }
             }
+            TrackHistory::track_history('Product',"Delete prodcut");
             return back()->with('info', 'Product Deleted.');
         } else {
             return back()->with('error', 'Sorry Something Went Wrong.');
@@ -339,6 +347,7 @@ class ProductController extends Controller
     {
         $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
         $paid = RetailerMenuOrder::where('retailer_id', session('business_id'))->first();
+        TrackHistory::track_history('View',"View prodcut");
         return redirect()->route('products')
             ->with('products', $products)
             ->with('paid', $paid);
@@ -364,6 +373,7 @@ class ProductController extends Controller
                     File::delete(public_path('images/dispensery/products/gallery/' . $expImage));
                 }
             }
+            TrackHistory::track_history('Gallery',"Delete Gallery Image");
             return redirect()->back()->with('success', 'Gallery Image Deleted.');
         } else {
             return redirect()->back()->with('error', 'Sorry something went wrong.');
@@ -447,6 +457,7 @@ class ProductController extends Controller
                     }
                 }
             }
+            TrackHistory::track_history('Product',"Update product");
             return redirect()->back()->with('info', 'Product Updated.');
         } else {
             return redirect()->back()->with('error', 'Problem occured while updated product.');
@@ -486,12 +497,14 @@ class ProductController extends Controller
                 if ($created) {
                     session()->flash('success', 'Your payment has been successful');
                     $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+                    TrackHistory::track_history('View',"View Products");
                     return view('products.index')
                         ->with('products', $products)
                         ->with('paid', $created);
                 } else {
                     session()->flash('error', 'Sorry something went wrong');
                     $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+                    TrackHistory::track_history('View',"View Products");
                     return view('products.index')
                         ->with('products', $products)
                         ->with('paid', NULL);
@@ -499,6 +512,7 @@ class ProductController extends Controller
             } else {
                 session()->flash('error', 'Sorry we couldn\'t process the payment');
                 $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+                TrackHistory::track_history('View',"View Products");
                 return view('products.index')
                     ->with('products', $products)
                     ->with('paid', NULL);
@@ -509,6 +523,7 @@ class ProductController extends Controller
             }
             session()->flash('error', 'Sorry something went wrong');
             $products = DispenseryProduct::where('dispensery_id', session('business_id'))->get();
+            TrackHistory::track_history('Payment',"Save Payment");
             return view('products.index')
                 ->with('products', $products)
                 ->with('paid', NULL);

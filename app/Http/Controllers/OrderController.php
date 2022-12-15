@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use App\Http\TrackHistory;
 
 class OrderController extends Controller
 {
@@ -19,6 +20,7 @@ class OrderController extends Controller
         Order::where('retailer_id', session('business_id'))->update([
             'read' => 0
         ]);
+        TrackHistory::track_history('Order  ',"View Orders");
         return view('orders.index', [
             'orders' => $orders
         ]);
@@ -43,6 +45,7 @@ class OrderController extends Controller
             $businessType = Business::where('id', $order->retailer_id)->pluck('business_type')->first();
             Mail::to($order->customer_email)->send(new OrderStatus($order->tracking_number, $businessType, $validated['status']));
         }
+        TrackHistory::track_history('Order  ',"Order Status Update");
         if ($updated) {
             if ($order->product_id != null) {
                 $product = DB::table('dispensery_products')->where('id', $order->product_id)->first();
@@ -79,6 +82,7 @@ class OrderController extends Controller
             'rating' => 'required'
         ]);
         $updated = Order::where('id', $validated['order_id'])->update(['rating' => $validated['rating']]);
+        TrackHistory::track_history('Order  ',"Order Status Update");
         if ($updated) {
             return back()->with('success', 'Review is added');
         } else {
